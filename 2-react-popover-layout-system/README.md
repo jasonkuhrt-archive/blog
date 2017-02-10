@@ -38,17 +38,31 @@ The ordinal side "before" concretely refers to either top or left, "after" to bo
 
 Note that unlike Relative Axes there's nothing relative about Ordinal Sides. Each axis always has a "before" and "after" side.
 
-Zone Determination
 
-Main Axis Centre Match
+
+## Zone Determination
+
+Popover will be positioned within one of four zones. The zone that best fits Popover will be chosen. For each zone we calculate the result of subtracting Popover's dimensions from it. Then based on these results we bucket zones into three tiers of preference (each tier is less preferable than the previous):
+
+1. zones have positive difference on both dimensions
+2. zones have positive difference on just one dimension
+3. zones have negative difference on both dimensions
+
+Tier 1 zones are sorted by the sums of each zone's result, descending. So the fist zone in this list is that which fits Popover with the most extra area overall.
+
+Tier 2 and tier 3 zones are sorted by each one's percentage of crop, ascending. So the first zone in this list is that which crops Popover the least overall.
+
+With the best zone chosen we now need to find the best position within that zone.
+
+## Main Axis Centre Match
 -> Bounded Mode
 -> Unbounded Mode
 -> Semi-Bounded Mode
 
-Tip
+## Tip
 -> Tip Positioning
 -> Tip Rotation
 
-Edge Cases
+## Edge Cases
 -> Jitter
 -> Split Brain
