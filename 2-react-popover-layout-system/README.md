@@ -52,12 +52,20 @@ Tier 1 zones are sorted by the sums of each zone's result, descending. So the fi
 
 Tier 2 and tier 3 zones are sorted by each one's percentage of crop, ascending. So the first zone in this list is that which crops Popover the least overall.
 
-With the best zone chosen we now need to find the best position within that zone.
+
+
 
 ## Main Axis Centre Match
--> Bounded Mode
--> Unbounded Mode
--> Semi-Bounded Mode
+
+With the zone selected we can now calculate the best position for Popover therein.
+
+Our algorithm looks for the closest position of Popover that would see its main axis matched to that of Target. The reason we use a "closest" semantic rather than "exact" is that the Frame may prevent Popover from reaching its exact goal.
+
+Our algorithm has three available strategies for finding the closest position. They are: Bounded, Unbounded, Semi-bounded. Each strategy entails fundamentally different tradeoffs, and none are necessarily better or worse. It depends on the user's use-case. Therefore which strategy the algorithm will use is something the user will configure beforehand.
+
+### Bounded
+### Unbounded
+### Semi-Bounded
 
 ## Tip
 -> Tip Positioning
