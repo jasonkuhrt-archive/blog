@@ -2,7 +2,7 @@
 
 This article is an overview of the layout algorithm used for react-popover. If you are curious about what react-popover is or why it exists then you may want to read a recent article detailing its back-story.
 
-...
+----
 
 ## Component Anatomy
 
@@ -34,7 +34,7 @@ Relative Axes is a simple idea but perhaps better expressed visually than in wor
 
 If we abstract away concrete orientation then how do we continue thinking about the four sides of a box: top, right, bottom, left? The solution is to to remove their implied orientation and think about order. By prefixing relative axes to disambiguate we are freed to generalize the four sides into two simply two positions: "before" and "after".
 
-The ordinal side "before" concretely refers to either top or left, "after" to bottom or right. The choice of mapping "before" to "top" for vertical orientation reflects the coordinate system on the web where 0,0 is located top-left rather than bottom-left. To people familiar with Math, Adobe Flash, and probably many other things the latter is probably what you feel more natural with, but alas I took the expedient approach by staying consistent with the web, odd as it is.
+The ordinal side "before" concretely refers to either top or left; conversely "after" refers to either bottom or right. The choice of mapping "before" to vertical orientation "top" (as opposed to "bottom") reflects the coordinate system on the web where 0,0 is located top-left rather than bottom-left. To people familiar with Math, Adobe Flash, or other settings, the latter is likely more natural, but alas I took the expedient approach by staying consistent with the web.
 
 Note that unlike Relative Axes there's nothing relative about Ordinal Sides. Each axis always has a "before" and "after" side.
 
@@ -59,17 +59,30 @@ Tier 2 and tier 3 zones are sorted by each one's percentage of crop, ascending. 
 
 With the zone selected we can now calculate the best position for Popover therein.
 
-Our algorithm looks for the closest position of Popover that would see its main axis matched to that of Target. The reason we use a "closest" semantic rather than "exact" is that the Frame may prevent Popover from reaching its exact goal.
+Our algorithm looks for the position of Popover that would see its main axis matched to that of Target. Depending on what the user has decided, this positioning may behave in three distinct ways: sensitive to the Frame bounds, ignore the frame bounds, or be a hybrid of both wherein only up to a certain threshold are Frame bounds honored, after which they are ignored. Respectively these modes are called "bounded", "unbounded", "semi-bounded".
 
-Our algorithm has three available strategies for finding the closest position. They are: Bounded, Unbounded, Semi-bounded. Each strategy entails fundamentally different tradeoffs, and none are necessarily better or worse. It depends on the user's use-case. Therefore which strategy the algorithm will use is something the user will configure beforehand.
+The specifics of the modes are as follows. If positioning Popover to have its main axis exactly match Target's would cause Popover to exceed Frame bounds...
 
 ### Bounded
+
+...then position Popover up to Frame edge but not beyond it.
+
 ### Unbounded
+
+...then no matter, do so.
+
 ### Semi-Bounded
+...then calculate if the area percentage cropped of Target (if any) would exceed the given threshold. If it would then allow Popover to break bounds (like unbounded), otherwise only allow Popover to go up to edge (like bounded).
+
+It is conceivable that another factor for the threshold could be the _Popover's_ percentage area cropped. Its unclear to me if this would be useful or not though.
+
+
 
 ## Tip
 -> Tip Positioning
 -> Tip Rotation
+
+
 
 ## Edge Cases
 -> Jitter
