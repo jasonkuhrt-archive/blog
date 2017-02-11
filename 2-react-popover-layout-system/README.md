@@ -6,6 +6,8 @@ This article is an overview of the layout algorithm used for react-popover. If y
 
 ## Component Anatomy
 
+![anatomy-layout.png]()
+
 There are three core and independent components in our system: Target, Popover, Frame. There is also an auxiliary component within Popover called Tip.
 
 Our system knows virtually nothing about the core components except their position and bounding box dimensions. Tip requires a superset of this knowledge, adding just one additional point which is that at zero-rotation it is in its "upward pointing state" (this places a very minor constraint on how the contents of Tip should be laid out).
@@ -17,6 +19,8 @@ Target is the aim of Popover. Popover is the thing we are trying to automaticall
 ## Layout Anatomy
 
 The layout system is based upon two ideas: the x and y orientations in a 2D plain and the four sides of a box. These two ideas map to two parts of our layout system termed "relative axes" and "edges". If you are familiar with the Flexbox specification then our system may seem vaguely familiar to you.
+
+![ordinal-sides.png]()
 
 ### Relative Axes
 
@@ -42,6 +46,8 @@ Note that unlike Relative Axes there's nothing relative about Ordinal Sides. Eac
 
 ## Zone Determination
 
+![zone-determination.png]()
+
 Popover will be positioned within one of four zones. The zone that best fits Popover will be chosen. For each zone we calculate the result of subtracting Popover's dimensions from it. Then based on these results we bucket zones into three tiers of preference (each tier is less preferable than the previous):
 
 1. zones have positive difference on both dimensions
@@ -53,6 +59,8 @@ Tier 1 zones are sorted by the sums of each zone's result, descending. So the fi
 Tier 2 and tier 3 zones are sorted by each one's percentage of crop, ascending. So the first zone in this list is that which crops Popover the least overall.
 
 
+![zone-scenarios.png]()
+
 
 
 ## Main Axis Centre Match
@@ -63,27 +71,53 @@ Our algorithm looks for the position of Popover that would see its main axis mat
 
 The specifics of the modes are as follows. If positioning Popover to have its main axis exactly match Target's would cause Popover to exceed Frame bounds...
 
+![popover-centering.png]()
+
 ### Bounded
 
 ...then position Popover up to Frame edge but not beyond it.
+
+![popover-bounded.png]()
 
 ### Unbounded
 
 ...then no matter, do so.
 
+![popover-unbounded.png]()
+
 ### Semi-Bounded
+
 ...then calculate if the area percentage cropped of Target (if any) would exceed the given threshold. If it would then allow Popover to break bounds (like unbounded), otherwise only allow Popover to go up to edge (like bounded).
 
 It is conceivable that another factor for the threshold could be the _Popover's_ percentage area cropped. Its unclear to me if this would be useful or not though.
 
+![popover-semi-bounded.png]()
+
 
 
 ## Tip
--> Tip Positioning
--> Tip Rotation
+
+As mentioned in the introductory anatomy Tip is a sub-component of Popover. Its job is to visually hint the relationship between Popover and Target.
+
+Our system assumes that Tip has a pointer on top and base on bottom. In other words that at rest (no rotation) Tip is pointing upward. This additional knowledge required by the algorithm could be configurable but either way the knowledge is necessary to be sure our rotation logic will be correct (see below).
+
+We attempt to position Tip along the main axis of Popover/Target but just as the position of Popover can be affected by Frame so to can Tip's position be affected by the positioning relationship between Target and Popover. The logic is:
+
+* Along main-axis Tip is between Popover and Target
+* Along cross-axis Tip is at center between the closest before edge and the closest after edge from either Target or Popover.
+* Tip pointer is adjacent (faces) Target. This implies rotation.
+
+![tip-centering.png]()
+![tip-rotation.png]()
 
 
 
 ## Edge Cases
--> Jitter
--> Split Brain
+
+### Jitter
+
+![edge-case-jitter.png]()
+
+### Split Brain
+
+![edge-case-split-brain.png]()
