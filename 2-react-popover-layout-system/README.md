@@ -1,6 +1,6 @@
 # React Popover Layout Algorithm
 
-This article is an overview of the layout algorithm used for react-popover. If you are curious about what react-popover is or why it exists then you may want to read a recent article detailing its back-story.
+This article is an overview of the layout algorithms used for react-popover. If you are curious about what react-popover is or why it exists then you may want to read a recent article detailing its back-story.
 
 ----
 
@@ -48,18 +48,31 @@ Note that unlike Relative Axes there's nothing relative about Ordinal Sides. Eac
 
 ![zone-determination.png]()
 
-Popover will be positioned within one of four zones. The zone that best fits Popover will be chosen. For each zone we calculate the result of subtracting Popover's dimensions from it. Then based on these results we bucket zones into three tiers of preference (each tier is less preferable than the previous):
+Popover will be positioned in the zone deemed best amongst all four possibilities. The algorithm requires two passes. First calculate the fit of each zone and then rank those fits to find the optimal zone.
 
-1. zones have positive difference on both dimensions
-2. zones have positive difference on just one dimension
-3. zones have negative difference on both dimensions
+### Calculating Fits
 
-Tier 1 zones are sorted by the sums of each zone's result, descending. So the fist zone in this list is that which fits Popover with the most extra area overall.
+For each zone we subtract Popover's height and width from it. When doing this we also have to factor in the Tip's main-axis length. Appendix A goes into detail about how and why this is done.
 
-Tier 2 and tier 3 zones are sorted by each one's percentage of crop, ascending. So the first zone in this list is that which crops Popover the least overall.
+### Calculating Ranks
 
+To rank zones based on their fit we take the following steps:
+
+1. Group zones into first or second class. First class zones are those whose calculated fit has a positive difference on both dimensions. Second class zones are those whose calculated fit has a negative difference on one or both dimensions.
+2. Pick the first class zone with the largest area.
+3. If there are no first class zones then pick the second class zone with the least percentage of its area exceeding Frame bounds.
 
 ![zone-scenarios.png]()
+
+
+TODO
+Revise jitter section to encompass the following
+flush out the following stub ...:
+* threshold-based changes between first class zones to prevent jitter
+* upgrading (change from second to first class) will not be subject to thresholds
+* threshold 0 means single-pixel-difference sensitivity
+* threshold 0.2 means other zone must have 20% more area to trigger change
+* threshold Infinity means disable changing between first class zones altogether. Only move to a zone upon initial layout or when upgrading
 
 
 
@@ -114,10 +127,35 @@ We attempt to position Tip along the main axis of Popover/Target but just as the
 
 ## Edge Cases
 
-### Jitter
+There are two edge-cases that can lead to poor or unusable UX. These edge-cases can be overcome with careful attention.
+
+### Appendix A: Infinite Loop
+
+This section discusses why we must specially consider Tip dimensions when calculating a zone's fit rank.
+
+![edge-case-infinite-loop.png]()
+
+If Tip was not specially handled then it would be possible for an infinite loop of zone rank changes to occurs in some cases. Consequently the Popover would enter an infinite loop of repositions. This issue affects Class 2 and 3 but not 1 because of how its algorithm works.
+
+* _given an optimal-zone change in the opposite axis_
+* Tip will be moved such that it changes from extending length of Popover in one orientation to the other. For example the Tip goes from being on the right side of Popover (extends width) to below it (extends height)
+* Popover dimensions, upon being positioned into the new optimal-zone, have changed, as a result of the new position assigned to Tip
+* Popover dimension change triggers a new zone-ranking calculation to be made
+* _given the new optimal-zone's rank difference with previous optimal-zone is smaller than Tip's main axis length_
+* the zone-ranking calculation determines that what was previously the optimal-zone is once again the optimal-zone
+* infinite loop
+
+A non-general solution to this problem is to always add the Tip's main-axis length to Popover's main-axis length when calculating a zone's fit rank.
+
+TODO integrate this
+To compare zone dimensions with Popover without causing infinite layout loops (See Appendix A) we must add the Tip's main-axis length to the Popover's dimension which would fall upon the main-axis for the respective zone. For example when calculating Popover fit within Top Zone add Tip length to the height of Popover; for Right Zone add Tip length to width of Popover; etc. This is necessary to avoid infinite layout loops (to learn why see Appendix A "Infinite Loop").
+
+### Appendix B: Jitter Magnification
 
 ![edge-case-jitter.png]()
 
-### Split Brain
+When some change in the arrangement or size of components leads to a change in zone ranks then Popover will in turn be repositioned to reflect its new optimal placement. This is generally good but problems can arise when the ranks are very tight by which we mean that the arrangement, sizing, etc. of components is on the precipice of other zones being optimal. Analogy: imagine weights on a scale that are within sand-grains of each other.
 
-![edge-case-split-brain.png]()
+The problem with this condition is that minor jitters are magnified into excessive layout changes, generally hurting the user-experience. For example a jittery Popover is distracting reading of something else in view or worse yet the content being read is _in said jittering popover_. A more concrete example: imagine Frame is the window and zones ranks are tight. If the user jitters the window's scroll position then so too goes Popover!
+
+The underlying problem is that we have tightly coupled jitter from the inputs (arrangement, size, etc. of Target, Popover, Frame) to pass right through to our output (zone ranking). The solution is to use [hysteresis](https://en.wikipedia.org/wiki/Hysteresis) to filter out these minor fluctuations. Only then can we maintain a stable layout in the face of unstable inputs. The exact threshold to be used in the hysteresis should probably be configurable since not all use-cases will have the same stability requirements.
