@@ -1,19 +1,25 @@
 # React Popover Layout Algorithm
 
-This article is an overview of the layout algorithms used for react-popover. If you are curious about what react-popover is or why it exists then you may want to read a recent article detailing its back-story.
+This is a technical document regarding the design and layout techniques used in react-popover. If you are generally curious about what react-popover is, why it exists, etc. then you may want to read a recent article detailing its back-story.
 
 ----
 
 ## Component Anatomy
 
-There are three core and independent components in our system: Target, Popover, Frame. There is also an auxiliary component within Popover called Tip.
-
-Our system knows virtually nothing about the core components except their position and bounding box dimensions. Ditto for Tip except we additionally must know at which degree it is in a "upward pointing state".
-
-Target is the aim of Popover. Popover is the thing we are trying to automatically position relative to Target. Popover's position can also be influenced by Frame. Frame is the bounding box that Popover's own bounding box must be/should be within (which semantic to use is configurable as we will see). Tip is a visual aid hinting that Popover refers to Target. Tip is positioned relative to Popover, but also Target as we will see.
 
 ![](anatomy-components.png)
 
+##### Parts
+
+Our system is built around the presence of the following three components: Target, Popover, and Frame. Additionally we also take into account a Tip component but its importance is auxiliary, not core, since its removal would not significantly change our system.
+
+##### Roles
+
+Target is the aim of Popover. Frame is the bounding box that Popover should remain within. And Popover itself is the thing we are positioning in relation to these. Tip is a visual cue reflecting Popover's aim and is positioned relative to Popover and Target.
+
+##### Assumptions
+
+Our system knows virtually nothing about the three core components except their position and dimensions. Tip is slightly different in that we additionally must know at which degree it is in a "upward pointing state".
 
 
 
