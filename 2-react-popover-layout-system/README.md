@@ -6,21 +6,21 @@ This article is an overview of the layout algorithms used for react-popover. If 
 
 ## Component Anatomy
 
-![anatomy-layout.png]()
-
 There are three core and independent components in our system: Target, Popover, Frame. There is also an auxiliary component within Popover called Tip.
 
 Our system knows virtually nothing about the core components except their position and bounding box dimensions. Ditto for Tip except we additionally must know at which degree it is in a "upward pointing state".
 
 Target is the aim of Popover. Popover is the thing we are trying to automatically position relative to Target. Popover's position can also be influenced by Frame. Frame is the bounding box that Popover's own bounding box must be/should be within (which semantic to use is configurable as we will see). Tip is a visual aid hinting that Popover refers to Target. Tip is positioned relative to Popover, but also Target as we will see.
 
+![](anatomy-components.png)
+
+
 
 
 ## Layout Anatomy
 
-The layout system is based upon x/y axes and the four sides of a box. It borrows a concept or two from Flexbox but is generally very much its own idea.
 
-![ordinal-sides.png]()
+The layout system is based upon x/y axes and the four sides of a box. It borrows a concept or two from Flexbox but is generally very much its own idea.
 
 #### Relative Axes
 
@@ -30,17 +30,21 @@ In our system relative axes are "main axis" and "cross axis" whose concrete orie
 
 If we abstract away concrete orientation then how do we continue thinking about the four sides of a box: top, right, bottom, left? The solution is to to remove their implied orientation and think about order. By prefixing the names of relative axes to disambiguate we are freed to generalize the four sides into two: before/after. The former refers to either top or left while the latter botttom or right [1].
 
+#### Diagram
+
+![](anatomy-layout.png)
+
 ## Calculate the optimal zone
 
-![zone-determination.png]()
+![](zones.png)
 
 Popover will be positioned in the zone deemed best amongst all four possibilities. The algorithm requires two passes. First calculate the fit of each zone and then rank those fits to find the optimal zone.
 
-#### Phase 1: Fits
+#### Phase 1: Measure
 
 For each zone we subtract Popover's height and width from it. When doing this we also have to factor in the Tip's main-axis length (see appendix A for how/why). The result is knowing how much spare space each zone would have on either of its dimensions after fitting Popover.
 
-#### Phase 2: Ranks
+#### Phase 2: Rank
 
 We group zones into first or second class. First class zones are those whose fit is positive on both dimensions. Second class zones are those whose fit is negative on one or both dimensions.
 
@@ -48,33 +52,39 @@ Next, pick the first class zone with the largest area. If there are no first cla
 
 Finally, check if the optimal zone just calculated beats previous optimal zone by the given threshold (see appendix B for how/why we support this). If it does then update Popover's position, otherwise do nothing.
 
-![zone-scenarios.png]()
+#### Example layout scenarios
+
+![](zone-scenarios2.png)
 
 
 
 ## Calculate Popover position
 
 
-![popover-centering.png]()
+With the optimal zone found we can now calculate the best position for Popover within it. Our algorithm looks for the position of Popover that would see its main axis matched to that of Target.
 
-With the optimal zone found we can now calculate the best position for Popover within it.
+![](positioning-mca.png)
 
-Our algorithm looks for the position of Popover that would see its main axis matched to that of Target. Depending on what the user has decided, this positioning may behave in three distinct ways: sensitive to Frame bounds, insensitive to frame bounds, sensitive to Frame bounds up to a given threshold. Respectively these modes are called "bounded", "unbounded", "semi-bounded".
+Depending on what the user has decided, this positioning may behave in three distinct ways: sensitive to Frame bounds, insensitive to frame bounds, sensitive to Frame bounds up to a given threshold. Respectively these modes are called "bounded", "unbounded", "semi-bounded".
 
 If positioning Popover to have its main axis exactly match Target's would cause Popover to exceed Frame bounds, then...
 
 * **Bounded**
 ...position Popover up to Frame edge but not beyond it
+
+![](positioning-bounded.png)
+
 * **Unbounded**
 ...go ahead
+
+![](positioning-unbounded.png)
+
 * **Semi-Bounded**
 ...calculate if the area percentage cropped of Target would exceed given threshold. If yes, then be unbounded, else be bounded.
 
   It is conceivable that another factor for the threshold could be the _Popover's_ percentage area cropped. Its unclear to me if this would be useful or not though.
 
-![popover-bounded.png]()
-![popover-unbounded.png]()
-![popover-semi-bounded.png]()
+  ![](positioning-semi-bounded.png)
 
 
 
@@ -86,8 +96,8 @@ As mentioned in the introductory anatomy Tip is a sub-component of Popover, its 
 * Along cross-axis: centered between nearest before-side and after-side amongst Target and Popover
 * Faces Target
 
-![tip-centering.png]()
-![tip-rotation.png]()
+![](tip-centering.png)
+![](tip-rotation.png)
 
 
 
@@ -97,17 +107,24 @@ These appendices cover deep details that underpin reliable layout.
 
 ### Appendix A: Infinite Loop
 
-![edge-case-infinite-loop.png]()
-
 When calculating a zone's fit the Tip's contribution to Popover dimensions must be specially handled. If it were not then an infinite loop of zone rank changes could occur in cases involving only second-class options.
 
 Tip length affects either height or width of Popover depending upon the zone side. So two zones of opposite orientation are going to manifest slightly different Popover dimensions. Consequently this could affect Popover crop percentage in second-class zones leading to always another zone appearing better than the current one. The diagram helps illustrate such a case.
 
 A non-general solution to this problem is to always add the Tip's main-axis length to Popover's main-axis length when calculating a zone's fit rank. For example for top zone add Tip length to the Popover height; for right zone add Tip length to Popover width; etc.
 
-### Appendix B: Minimum-improvement Thresholds to prevent layout Jitter
+#### Example Scenario
 
-![edge-case-jitter.png]()
+![](infini-loop.png)
+
+
+1. Popover moved and dimensions change because of Tip movement
+2. A new optimal zone (Tier 1) is calculated
+3. Popover moved and dimensions change because of Tip movement
+4. A new optimal zone (Tier 1) is calculated
+5. Go to 1
+
+### Appendix B: Minimum-improvement Thresholds to prevent layout Jitter
 
 Thresholds are needed to prevent layout jitter (bad for user-experience) caused by zones with tight ranking flipping around the precipice. The diagrams show examples of how minor jitters can be magnified into excessive layout changes.
 
@@ -117,6 +134,9 @@ Some threshold examples:
 
 * threshold 0.2 means balance stability and positioning: other zones need 20% greater area for change
 * threshold 0 means prioritize optimal position: other zones need 1px greater area for change
+
+![](change-threshold-0.png)
+
 * threshold Infinity means prioritize stability: other zones are never changed to unless it would mean upgrading from second class to first
 
 It may be useful to let users decide if they want to opt-in/out of zone class upgrades thereby limiting criteria for zone changes strictly to their differences in area.
