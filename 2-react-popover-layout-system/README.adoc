@@ -37,17 +37,15 @@ A visual cue reflecting Popover's aim and is positioned relative to Popover and 
 
 The layout system's goal is to find the optimal position for Popover. In minor ways it has been inspired by Flexbox but is generally very much its own idea.
 
-#### Relative Axes
+image::anatomy-layout.png[]
 
-In our system relative axes are "main axis" and "cross axis" whose concrete orientation depends upon Popover position relative to Target. The main axis is whichever one whose orientation contains Popover adjacent to Target. For example if Popover is horizontally adjacent to Target then the main axis is horizontal. The cross axis is simply whatever orientation main axis is not.
+#### Main/Cross Axes
 
-#### Ordinal Sides
+The relative axes of the system. Their concrete orientation depends upon Popover position relative to Target. The main axis along the orientation containing Popover adjacent to Target. The cross axis is parallel to the overall layout of Popover and Target.
+
+#### Before/After Sides
 
 If we abstract away concrete orientation then how do we continue thinking about the four sides of a box: top, right, bottom, left? The solution is to to remove their implied orientation and think about order. By prefixing the names of relative axes to disambiguate we are freed to generalize the four sides into two: before/after. The former refers to either top or left while the latter botttom or right footnote:[The choice of mapping "before" to "top" as opposed to "bottom" reflects the coordinate system on the web where 0,0 is top-left. To people familiar with Math, Adobe Flash, or other environments, this is unnatural but alas I took the expedient approach by staying consistent with the web.].
-
-#### Diagram
-
-image::anatomy-layout.png[]
 
 ## Calculate the optimal zone
 
@@ -105,13 +103,18 @@ image::positioning-semi-bounded.png[]
 
 ## Calculate Tip position
 
-As mentioned in the introductory anatomy Tip is a sub-component of Popover, its job to visually hint Popover's reference of Target. Our system assumes that Tip has a pointer on top and base on bottom. In other words that at rest (no rotation) Tip is pointing upward. Its layout rules are:
+Our system assumes that Tip has a pointer on top and base on bottom. In other words that at rest (no rotation) Tip is pointing upward. Its layout rules are:
 
-* Along main-axis: between Popover and Target
-* Along cross-axis: centered between nearest before-side and after-side amongst Target and Popover
-* Faces Target
+. Along main-axis: between Popover and Target
+. Along cross-axis: centered between nearest before-side and after-side amongst Target and Popover
+. Faces Target
+
+The first rule is straight forward but the second deserves a visualization:
 
 image::tip-centering.png[]
+
+Faces target means that we must rotate Tip depending on which side of Target it finds itself:
+
 image::tip-rotation.png[]
 
 
