@@ -3,7 +3,7 @@
 
 # React Popover Layout System
 
-This is a technical document regarding the design and layout techniques used in react-popover. If you are generally curious about what react-popover is, why it exists, etc. then you may want to read a link:../1-react-popover-history/README.adoc[recent article detailing its back-story].
+This is a technical document regarding the design and layout techniques used in react-popover. If you are generally curious about what react-popover is, why it exists, etc. then you may want to read a link:/1-react-popover-history/README.adoc[recent article detailing its back-story].
 
 toc::[]
 
