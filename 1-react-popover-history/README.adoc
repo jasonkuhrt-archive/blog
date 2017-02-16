@@ -1,12 +1,12 @@
 # Reviving React Popover
 
-![history](history.png)
+image::history.png[history]
 
 This is a tiny story about a tiny project I worked on at littleBits which grew a tiny following and that I’ve been given back write access to recently. Be warned this will probably a very mundane tale to you, but for me personally it was worth writing as I buckle back into the project.
 
 A few years ago while I was still toiling away at littleBits I worked on a particular mission with Colin Vernon (product), Shem (design), Alin Cosmanescu (electrical engineering), and others, to improve the the cloudBit on-boarding user experience. One of the many tasks was to improve the littleBits circuit diagrams we used for our setup instructions. We wanted them to communicate more directly via improved animation and interactive buoys highlighting key sections with additional details. Once selected, a popover would open around the buoy.
 
-![use-case](use-case.png)
+image::use-case.png[use-case]
 
 This is a story about that popover.
 
@@ -25,12 +25,10 @@ Jumping back into most any project after two years is likely to be non-trivial; 
 * no static types
 * no tests
 
-To rebuild my confidence and command of the codebase I have decided to carefully review the library’s core purpose: algorithmic layout. Specifically I want to clearly capture what it aims to achieve by using visual diagrams that illustrate how rules play out in various cases [1]. Not only will this be valuable for me now to reestablish my connection to the project but I think it could:
+To rebuild my confidence and command of the codebase I have decided to carefully review the library’s core purpose: algorithmic layout. Specifically I want to clearly capture what it aims to achieve by using visual diagrams that illustrate how rules play out in various cases footnote:[At first my diagrams will be static however I am interested in making them “live”, not unlike the diagrams found in essays by Bret Victor.]. Not only will this be valuable for me now to reestablish my connection to the project but I think it could:
 
 * help users understand the library
 * make it easier to implement a similar/same component in other UI frameworks e.g. Cycle
 * ease future maintenance because a good visual reference aids comprehending what dense layout code and the various domain terms are trying to achieve
 
 My review and accompanying diagrams will be published in the next few days.
-
-[1] At first my diagrams will be static however I am interested in making them “live”, not unlike the diagrams found in essays by Bret Victor.
