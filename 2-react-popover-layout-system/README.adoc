@@ -1,7 +1,7 @@
 :toc: macro
 :toc-title:
 
-# React Popover Layout Algorithm
+# React Popover Layout System
 
 This is a technical document regarding the design and layout techniques used in react-popover. If you are generally curious about what react-popover is, why it exists, etc. then you may want to read a link:../1-react-popover-history/README.adoc[recent article detailing its back-story].
 
@@ -51,7 +51,7 @@ If we abstract away concrete orientation then how do we continue thinking about 
 
 image::zones.png[]
 
-Popover will be positioned in the zone deemed best amongst all four possibilities. The algorithm requires two passes. First calculate the fit of each zone and then rank those fits to find the optimal zone.
+Popover will be positioned in the zone deemed best amongst all four possibilities. The algorithm executes in two phases. First measure the fit of each zone and then rank those fits to find the optimal zone.
 
 #### Phase 1: Measure
 
