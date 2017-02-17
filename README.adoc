@@ -1,0 +1,3 @@
+# Blog
+
+This is my collection of personal thoughts, essays, ideas, and anything else I conjure up. You can read the content on Github but this is not recommended due to difficult-to-read line lengths. Instead visit my blog hosted on https://jasonkuhrt.gitbooks.io/blog/[Gitbook] which should provide a better reading experience. 🚀
