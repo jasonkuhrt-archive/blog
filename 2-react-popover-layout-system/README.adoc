@@ -1,19 +1,23 @@
 :toc: macro
 :toc-title:
+:sectanchors:
+:toclevels: 99
 
 # React Popover Layout System
 
-This is a technical document regarding the design and layout techniques used in react-popover. If you are generally curious about what react-popover is, why it exists, etc. then you may want to read a link:/1-react-popover-history/README.adoc[recent article detailing its back-story].
+This is a technical document regarding the layout system powering react-popover. If you are generally curious about what react-popover is, why it exists, etc. then you may want to read a link:/1-react-popover-history/README.adoc[recent article detailing its back-story].
 
 toc::[]
 
 
+## Introduction
 
-## Anatomy
+The layout system's goal is to find the optimal position for Popover in relation to a handful of other distinct components. All it knows about them is their position and dimensions (except Tip where we need to control its directionality too). In minor ways (e.g. terminology) it has been inspired by Flexbox, but generally this system is very much its own original creation.
+
+
+## Glossary
 
 ### Components
-
-Our system is built around a set distinct components. All it knows about them is their position and dimensions (except Tip, we need to control its pointing direction too).
 
 image::anatomy-components.png[]
 
@@ -31,51 +35,59 @@ The thing we are positioning in relation to these. Our system will automatically
 
 ##### Tip
 
-A visual cue reflecting Popover's aim and is positioned relative to Popover and Target. Its importance to the system is less than other components since its removal would not significantly change it.
+A visual cue reflecting Popover's aim. It is positioned relative to Popover and Target.
 
+##### Arrangement
 
+The current position and dimensions of Target, Frame, and Popover.
 
 ### Layout
-
-
-The layout system's goal is to find the optimal position for Popover. In minor ways it has been inspired by Flexbox but is generally very much its own idea.
 
 image::anatomy-layout.png[]
 
 #### Main/Cross Axes
 
-The relative axes of the system. Their concrete orientation depends upon Popover position relative to Target. The main axis along the orientation containing Popover adjacent to Target. The cross axis is parallel to the overall layout of Popover and Target.
+Relative axes whose concrete orientation depend upon Popover's position relative to Target. The main axis is along the orientation containing Popover adjacent to Target while the cross axis is along that which does not cross through both Target and Popover.
 
 #### Before/After Sides
 
-If we abstract away concrete orientation then how do we continue thinking about the four sides of a box: top, right, bottom, left? The solution is to to remove their implied orientation and think about order. By prefixing the names of relative axes to disambiguate we are freed to generalize the four sides into two: before/after. The former refers to either top or left while the latter botttom or right footnote:[The choice of mapping "before" to "top" as opposed to "bottom" reflects the coordinate system on the web where 0,0 is top-left. To people familiar with Math, Adobe Flash, or other environments, this is unnatural but alas I took the expedient approach by staying consistent with the web.].
+If we abstract away concrete orientation via main/cross axes then how do we continue thinking about the four sides of a box: top, right, bottom, left? The solution is to to remove their implied orientation and think about order. By prefixing with a relative axis to disambiguate we are freed to generalize the four sides into two: before, after. The former refers to either top or left while the latter to bottom or right footnote:[The choice of mapping "before" to "top" as opposed to "bottom" reflects the coordinate system on the web where 0,0 is top-left. To people familiar with Math, Adobe Flash, or other environments, this is unnatural but alas I took the expedient approach by staying consistent with the web.].
+
+
 
 ## Algorithm
 
-### The optimal zone
+### Phase 1: Calculate the optimal zone
 
 image::zones.png[]
 
-Popover will be positioned in the zone deemed best amongst all four possibilities. The algorithm executes in two phases. First measure the fit of each zone and then rank those fits to find the optimal zone.
+Popover will be positioned in the zone deemed best amongst all four possibilities. The algorithm executes in three steps. First measure the fit of each zone and then rank those fits to find the optimal zone.
 
-##### Phase 1: Measure
+##### Step 1: Measure
 
-For each zone we subtract Popover's height and width from it. When doing this we also have to factor in the Tip's main-axis length (see appendix A for how/why). The result is knowing how much spare space each zone would have on either of its dimensions after fitting Popover.
+For each zone we subtract Popover's height and width from the zone's height and width. When doing this we also have to factor in the Tip's main-axis length (for why this is see <<app-a, appendix A>>). The result is knowing how much spare space each zone would have along either dimension after fitting Popover.
 
-##### Phase 2: Rank
+##### Step 2: Rank
 
 We group zones into first or second class. First class zones are those whose fit is positive on both dimensions. Second class zones are those whose fit is negative on one or both dimensions.
 
-Next, pick the first class zone with the largest area. If there are no first class zones then pick the second class zone with least percentage area exceeding Frame bounds. This is your optimal zone.
+Next, if there are first class zones, we pick the one with the largest area. Otherwise we pick the second class zone with least percentage area exceeding Frame bounds.
 
-Finally, check if the optimal zone just calculated beats previous optimal zone by the given threshold (see appendix B for how/why we support this). If it does then update Popover's position, otherwise do nothing.
+##### Step 3: Threshold
 
-##### Example layout scenarios
+With a zone selected we are almost ready to proceed to the next phase. First however we ensure that, if we are moving the Popover to a new zone, the change is worth it. For a discussion on why change thresholds are useful see <<app-b, appendix B>>.
+
+* If this is the first time we are laying out Popover then proceed with selected zone.
+* Otherwise this must be a recalculation meaning the arrangement changed. In this case...
+** If the selected zone is the current zone then proceed with selected zone.
+** Otherwise we are dealing with a major change in Popover position and so should do a bit more work before committing to it. We check if the selected zone has a sufficiently greater size than the current zone. If it does then proceed with selected zone, otherwise disregard selected zone and proceed with current zone!
+
+##### Examples
 
 image::zone-scenarios2.png[]
 
 
-### The Popover's position
+### Phase 2: Position the Popover
 
 
 With the optimal zone found we can now calculate the best position for Popover within it. Our algorithm looks for the position of Popover that would see its main axis matched to that of Target.
@@ -84,19 +96,19 @@ image::positioning-mca.png[]
 
 Popover should generally stay fully within the Frame but when this is not possible a fallback strategy can be applied. There are several different ones we have thought of which the user could choose between depending upon his/her needs.
 
-##### Bounded Mode
+##### Mode Bounded
 
 Popover may position up to the Frame boundary but not beyond it.
 
 image::positioning-bounded.png[]
 
-##### Unbounded Mode
+##### Mode Unbounded
 
 Popover effectively ignores the Frame
 
 image::positioning-unbounded.png[]
 
-##### Semi-Bounded Mode
+##### Mode Semi-Bounded
 
 Popover is in bounded mode until some percentage of the Target's area exceeds Frame bounds at which point Popover is Unbounded.
 
@@ -110,7 +122,7 @@ There are also other conceivable factors that could be the basis for more modes 
 
 
 
-### The Tip's position
+### Phase 3: Position the Tip
 
 Our system assumes that Tip has a pointer on top and base on bottom. In other words that at rest (no rotation) Tip is pointing upward. Its layout rules are:
 
@@ -132,6 +144,7 @@ image::tip-rotation.png[]
 
 These appendices cover deep details that underpin reliable layout.
 
+[[app-a]]
 ### Appendix A: Infinite Loop
 
 When calculating a zone's fit the Tip's contribution to Popover dimensions must be specially handled. If it were not then an infinite loop of zone rank changes could occur in cases involving only second-class options.
@@ -168,6 +181,7 @@ image::infini-loop-fixed.png[]
 2. Some change triggers a layout scan, another zone is closely ranked but given that its in the same class and exceeds Frame bounds more than in current position, current position remains.
 3. Done!
 
+[[app-b]]
 ### Appendix B: Minimum-improvement Thresholds to prevent layout Jitter
 
 Thresholds are needed to prevent layout jitter (bad for user-experience) caused by zones with tight ranking flipping around the precipice. The diagrams show examples of how minor jitters can be magnified into excessive layout changes.
