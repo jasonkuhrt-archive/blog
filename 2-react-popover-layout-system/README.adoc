@@ -82,11 +82,6 @@ With a zone selected we are almost ready to proceed to the next phase. First how
 ** If the selected zone is the current zone then proceed with selected zone.
 ** Otherwise we are dealing with a major change in Popover position and so should do a bit more work before committing to it. We check if the selected zone has a sufficiently greater size than the current zone. If it does then proceed with selected zone, otherwise disregard selected zone and proceed with current zone!
 
-##### Examples
-
-image::zone-scenarios2.png[]
-
-
 ### Phase 2: Position the Popover
 
 
@@ -137,6 +132,12 @@ image::tip-centering.png[]
 Faces target means that we must rotate Tip depending on which side of Target it finds itself:
 
 image::tip-rotation.png[]
+
+
+
+## Examples
+
+image::zone-scenarios2.png[]
 
 
 
