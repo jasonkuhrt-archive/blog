@@ -73,6 +73,12 @@ We group zones into first or second class. First class zones are those whose fit
 
 Next, if there are first class zones, we pick the one with the largest area. Otherwise we pick the second class zone with least percentage area exceeding Frame bounds.
 
+##### Example
+
+In the following example see how the measuring and ranking play out. Note how the right zone has greater remaining length available than the bottom zone (160 for right versus 150 for bottom) yet because it would have Popover exceed frame bounds its ranking is ultimately lower. The right zone is an example of second class.
+
+image::zone-measure2.png[]
+
 ##### Step 3: Threshold
 
 With a zone selected we are almost ready to proceed to the next phase. First however we ensure that, if we are moving the Popover to a new zone, the change is worth it. For a discussion on why change thresholds are useful see <<app-b, appendix B>>.
