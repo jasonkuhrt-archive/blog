@@ -33,19 +33,20 @@ Next, if there are first class zones, we pick the one with the largest area. Oth
 
 ##### Step 3: Threshold
 
-With a zone selected we check if between it and the current zone there exists sufficient improvement to warrant change. If so we will proceed with the selected zone but otherwise proceed with the current zone.
+With a zone selected we check if between it and the previous zone there exists sufficient improvement to warrant change. If so we will proceed with the selected zone, otherwise with the previous zone (as measured now).
 
-* If this is the first time we are laying out Popover then proceed with selected zone.
-* If selected zone is current zone then proceed with current zone.
-* Otherwise check if selected zone has a sufficiently greater size than current zone. If so then proceed with selected zone, otherwise disregard it and instead proceed with current zone.
+* Proceed with selected zone: If initial render.
+* Proceed with selected zone: If it is previous zone.
+* Proceed with selected zone: If it is first class and previous zone is second class.
+* Otherwise check if selected zone has a sufficiently greater size than previous zone. If yes then proceed with selected zone, otherwise proceed with previous zone.
 
 For a discussion on why change thresholds are useful see <<app-b, appendix B>>.
 
 ##### Example
 
-In the following example see how the measuring and ranking play out. Note how the right zone has greater remaining length available than the bottom zone (160 for right versus 150 for bottom) yet because it would have Popover exceed frame bounds its ranking is ultimately lower. The right zone is an example of second class.
+In the following diagram (<<zmd, legend>>) see how the measuring and ranking play out. Interestingly, the right zone has greater remaining length available than the bottom zone yet is ranked lower. This is because the right zone would have Popover exceed frame bounds while bottom would not. The right zone is an example of second class.
 
-image::zone-measure2.png[]
+image::zone-measure.png[]
 
 
 
@@ -53,43 +54,37 @@ image::zone-measure2.png[]
 
 With the optimal zone found we can now calculate the best position for Popover within it. Our algorithm looks for the position of Popover that would see its main axis matched to that of Target.
 
-image::positioning-mca.png[]
+image::positioning.png[]
 
-Popover should generally stay fully within the Frame but when this is not possible a fallback strategy can be applied. There are several different ones we have thought of which the user could choose between depending upon his/her needs.
+When it is not possible for Popover to remain within Frame bounds then one of several fallback strategies may be applied. Exactly which one depends upon what the user has chosen ahead of time.
 
 ##### Mode Bounded
 
-Popover may position up to the Frame boundary but not beyond it.
+Position Popover up to the Frame bounds but not beyond them.
 
 image::positioning-bounded.png[]
 
 ##### Mode Unbounded
 
-Popover effectively ignores the Frame
+Frame bounds are ignored.
 
 image::positioning-unbounded.png[]
 
-##### Mode Semi-Bounded
-
-Popover is in bounded mode until some percentage of the Target's area exceeds Frame bounds at which point Popover is Unbounded.
-
-image::positioning-semi-bounded.png[]
-
 ### Phase 3: Position the Tip
 
-Our system assumes that Tip has a pointer on top and base on bottom. In other words that at rest (no rotation) Tip is pointing upward. Its layout rules are:
+Our system assumes that Tip is pointing upward at zero degrees rotation. Its layout rules are:
 
 . Along main-axis: between Popover and Target
-. Along cross-axis: centered between nearest before-side and after-side amongst Target and Popover
-. Faces Target
 
-The first rule is straight forward but the second deserves a visualization:
+. Along cross-axis: centered between the two nearest cross-sides amongst Target and Popover:
 
 image::tip-centering.png[]
 
-Faces target means that we must rotate Tip depending on which side of Target it finds itself:
+. Faces Target. This means that we must rotate Tip depending on which side of Target it finds itself:
 
 image::tip-rotation.png[]
+
+
 
 ## Examples
 
@@ -163,6 +158,11 @@ image::change-threshold-0.png[]
 It may be useful to let users decide if they want to opt-in/out of zone class upgrades thereby limiting criteria for zone changes strictly to their differences in area.
 
 ## Glossary
+
+[[zmd]]
+### Zone Measure Diagram
+
+image::zone-measure-legend.png[]
 
 ### Components
 
