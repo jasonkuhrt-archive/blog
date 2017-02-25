@@ -23,7 +23,7 @@ Popover will be positioned in the best zone of four. The algorithm to decide thi
 
 ##### Step 1: Measure
 
-For each zone we subtract Popover's height and width from the zone's height and width. When doing this we also have to factor in the Tip's main-axis length (for why this is see <<app-a, appendix A>>). The result is knowing how much spare space each zone would have along either dimension after fitting Popover.
+For each zone we subtract Popover's height and width from the zone's height and width. When doing this we also have to factor in the Tip's main-axis length (see <<app-a, appendix A>> for more details about why). The result is knowing how much spare space each zone would have along either dimension after fitting Popover.
 
 ##### Step 2: Rank
 
@@ -74,95 +74,59 @@ image::positioning-unbounded.png[]
 
 Our system assumes that Tip is pointing upward at zero degrees rotation. Its layout rules are:
 
-. Along main-axis: between Popover and Target
+. Face the target.
 
-. Along cross-axis: centered between the two nearest cross-sides amongst Target and Popover:
+. Along main-axis: position between Popover and Target.
+
+. Along cross-axis: position centered between the two nearest cross-sides amongst Target and Popover:
 
 image::tip-centering.png[]
 
-. Faces Target. This means that we must rotate Tip depending on which side of Target it finds itself:
 
-image::tip-rotation.png[]
-
-
-
-## Examples
-
-image::zone-scenarios2.png[]
-
-## Future Work
-
-##### Bounding Modes
-
-Ideally we can allow the user to design their own bespoke strategy with ease. For example if there were an observable event stream regarding Target's area exceeding Frame bounds then users could execute arbitrary actions at any thresholds, e.g. instead of making Popover enter unbounded mode just close it.
-
-There are also other conceivable factors that could be the basis for more modes including a threshold of Popover's percentage area exceeding bounds (as opposed to the Target).
 
 ## Appendices
 
-These appendices cover deep details that underpin reliable layout.
+### Examples
+
+image::examples.png[]
 
 [[app-a]]
-### Appendix A: Infinite Loop
+### Appendix A: Factoring in Tip's main length
 
-When calculating a zone's fit the Tip's contribution to Popover dimensions must be specially handled. If it were not then an infinite loop of zone rank changes could occur in cases involving only second-class options.
-
-##### Problem
-
-Observe that that Tip length affects either height or width of Popover depending upon the zone side. As such zones of opposite orientation manifest slightly different Popover dimensions. If not handled right this can trigger an infinite layout loop between two second-class zones of opposite orientation. Said change in dimension will affect the percentage of crop experienced by Popover in turn leading to always another zone appearing superior than the current one. The following diagram helps illustrate this.
-
-##### Example scenario were we not to account for Tip
+Observe that that Tip length affects either height or width of Popover depending upon the zone side. As such zones of opposite orientation manifest slightly different Popover dimensions. If not handled right this can trigger an infinite layout loop between two second-class zones of opposite orientation. Said change in dimension will affect the percentage of crop experienced by Popover in turn leading to always another zone appearing superior than the current one. The following diagram helps illustrate this:
 
 image::infini-loop.png[]
 
 1. Popover in place from some previous lead up or just positioned and then dimensions change because of Tip movement
 2. A new optimal zone in first class is detected
 3. Popover positioned. Dimensions change because of Tip movement
-4. A new optimal zone in first class is detected
-5. Go to 1...
+4. A new optimal zone in first class is detected; Go to 1
 
-
-
-##### Solution
-
-A non-general solution to this problem is to always add the Tip's main-axis length to Popover's main-axis length when calculating a zone's fit rank. For example for top zone add Tip length to the Popover height; for right zone add Tip length to Popover width; etc.
-
-TODO diagram
-
-If we revisit the scenario from before it would now play out more like the following.
-
-##### Example Scenario when we do account for Tip
+One solution to this problem is to always add the Tip's main-axis length to Popover's main-axis length when calculating a zone's fit rank. For example for top zone add Tip length to the Popover height; for right zone add Tip length to Popover width; etc. If we revisit the scenario from before it would now play out like the following.
 
 image::infini-loop-fixed.png[]
 
 1. Popover in place from some previous lead up
 2. Some change triggers a layout scan, another zone is closely ranked but given that its in the same class and exceeds Frame bounds more than in current position, current position remains.
-3. Done!
 
 [[app-b]]
-### Appendix B: Minimum-improvement Thresholds to prevent layout Jitter
+### Appendix B: Change Thresholds
 
-Thresholds are needed to prevent layout jitter (bad for user-experience) caused by zones with tight ranking flipping around the precipice. The diagrams show examples of how minor jitters can be magnified into excessive layout changes.
+Change thresholds are useful in preventing layout jitter caused by zones with tight ranking flipping around the precipice. But even in less extreme conditions they can be useful to balance the needs of layout with that of user experience where the presumption is that an occasionally moving Popover is more jarring than a stable one.
 
-The underlying problem thresholds solve is that without them we have tightly coupled jitter from the inputs (arrangement, size, etc. of Target, Popover, Frame) to pass right through to our output (zone ranking). Thresholds allow us to define and filter out insignificant zones rank changes, controlling the balance between optimal positioning and layout stability.
-
-Some threshold examples:
-
-* threshold 0.2 means balance stability and positioning: other zones need 20% greater area for change
-* threshold 0 means prioritize optimal position: other zones need 1px greater area for change
+A low threshold can protect against basic layout jitter. In the following you can imagine the Target might be some kind of draggable, while the Frame might be some kind of scrollable. Without thresholds jitter in either would propagate to the Popover.
 
 image::change-threshold-0.png[]
 
-* threshold Infinity means prioritize stability: other zones are never changed to unless it would mean upgrading from second class to first
+A large threshold can limit zone changes. In the following see you can see how Popover will not change zones until it sees one three times greater in area.
 
-It may be useful to let users decide if they want to opt-in/out of zone class upgrades thereby limiting criteria for zone changes strictly to their differences in area.
+image::change-threshold-75.png[]
+
+An "infinite" threshold can disable zone changes altogether except for class upgrades.
+
+image::change-threshold-100.png[]
 
 ## Glossary
-
-[[zmd]]
-### Zone Measure Diagram
-
-image::zone-measure-legend.png[]
 
 ### Components
 
@@ -205,3 +169,8 @@ A rectangle between the inner frame and outer Target. There are four zones betwe
 ##### Arrangement
 
 The current position and dimensions of Target, Frame, and Popover.
+
+[[zmd]]
+### Zone Measure Diagram
+
+image::zone-measure-legend.png[]
