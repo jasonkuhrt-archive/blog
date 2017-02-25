@@ -3,7 +3,7 @@
 :sectanchors:
 :toclevels: 99
 
-# React Popover Layout System
+# The layout system powering React Popover
 
 image::zones.png[]
 
@@ -13,7 +13,11 @@ toc::[]
 
 ## Introduction
 
-The layout system's goal is to find the optimal position for Popover in relation to a handful of other distinct components. All it knows about them is their position and dimensions (except Tip where we need to control its directionality too). In minor ways (e.g. terminology) it has been inspired by Flexbox, but generally this system is very much its own original creation.
+The layout system's goal is to find the optimal position for Popover in relation to a handful of other distinct components. All it knows about them is their position and dimensions (except Tip where we need to control its directionality too).
+
+image::introduction.png[]
+
+The system as it is here has evolved organically from what was originally a rough idea and hasty implementation over a year ago. It is informal, bespoke, and by no means exhibits geometric mathematical proofs or other kinds of formal rigour. While I'm very curious about those things my practical knowledge comes from a background in design and informal engineering. This is a humble little system with a small scope. It looks in awe at greater work like http://constraints.cs.washington.edu/web/ccss-uwtr.pdf[Constraint Cascading Style Sheets for the Web] and http://overconstrained.io/[Cassowary].
 
 ## Algorithm
 
