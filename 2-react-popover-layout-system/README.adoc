@@ -91,6 +91,11 @@ image::tip-centering.png[]
 
 At this point the optimal position of Popover as governed by our ruleset has been reached. Should the dimensions of any component change (including Popover itself), or should the coordinates of Target or Frame change, then we will need to rerun this algorithm again to find Popover's next optimal position.
 
+A serious limitation of the current system is that it only works for components that are rectangles. Support for arbitrarily shaped components would probably greatly increase the complexity of this system, but it sure sounds like fun to try and do it :). Maybe it would borrow from graphics layout ideas used in video games, but I'm really not sure.
+
+Another nice area for future work would be live interactive diagrams. I am inspired by Bret Victor's work!
+
+
 
 ## Appendices
 
