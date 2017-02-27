@@ -27,15 +27,19 @@ Popover will be positioned within the optimal zone. The algorithm to decide this
 
 ##### Step 1: Measure
 
-For each zone we subtract Popover's height and width from the zone's height and width. When doing this we also have to factor in the Tip's main-axis length . The result is knowing how much spare space each zone would have along either dimension after fitting Popover. We refer to this result as the zone's "fit".
+By default all zones are eligible for consideration but the user is able to effectively disable some if she wishes. This is expressed in terms of "allowed zones" which can be any of: vertical, horizontal, before, after, top, bottom, left, right.
+
+For each eligible zone we subtract Popover's height and width from the zone's height and width. When doing this we also have to factor in the Tip's main-axis length. The result is knowing how much spare space each zone would have along either dimension after fitting Popover. We refer to this result as the zone's "fit".
 
 _Note: See <<app-b>> for a deep dive on a fun edge case I encountered while spiking the initial implementation two years ago._
 
 ##### Step 2: Rank
 
-We group zones into first or second class. First class zones are those whose fit is positive on both dimensions. Second class zones are those whose fit is negative on one or both dimensions.
+We group the measured zones into first or second class. First class zones are those whose fit is positive on both dimensions. Second class zones are those whose fit is negative on one or both dimensions.
 
-If there are first class zones, we pick the one with the largest area. Otherwise we pick the second class zone with least percentage area exceeding Frame bounds.
+If there are first class zones then we pick the one with the greatest area. The only exception is if the user has specified a preferred zone which is in the first class set and whose threshold of not having another zone of n-percent greater area is met; In which case the preferred zone is used (even if it does not have the greatest area).
+
+Otherwise if there are only second class zones, pick the one with least percentage area cropped (exceeding Frame bounds). Again the only exception is if the user has specified a preferred zone. The same logic applies as before but here the threshold is about not having another zone of n-percent less area cropped.
 
 ##### Step 3: Threshold
 
@@ -93,7 +97,7 @@ At this point the optimal position of Popover as governed by our ruleset has bee
 
 A serious limitation of the current system is that it only works for components that are rectangles. Support for arbitrarily shaped components would probably greatly increase the complexity of this system, but it sure sounds like fun to try and do it :). Maybe it would borrow from graphics layout ideas used in video games, but I'm really not sure.
 
-Another nice area for future work would be live interactive diagrams. I am inspired by Bret Victor's work!
+Another nice area for future work would be live interactive diagrams. I am inspired by Bret Victor's essays!
 
 
 
@@ -170,6 +174,10 @@ Zone Fit :: How well a given zone fits the Popover. Determined by subtracting th
 First Class Zone :: A zone whose fit is positive on both dimensions.
 
 Second Class Zone :: A zone whose fit is negative on one or both dimensions.
+
+Preferred Zones :: A user configurable option that tweaks the algorithm to prefer particular zones during ranking. The preference is specified as a threshold of how much better can other zones be while preferring these ones. The zones can be expressed as any of: vertical, horizontal, before, after, top, bottom, left, right.
+
+Allowed Zones :: A user configurable option that tweaks the algorithm to disable zones altogether. "Disabled" means the zone cannot be used for layout. The allowed zones can be expressed as any of: vertical, horizontal, before, after, top, bottom, left, right.
 
 [[zmd]]
 ### Zone Measure Diagram
