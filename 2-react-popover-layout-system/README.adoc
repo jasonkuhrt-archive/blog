@@ -180,4 +180,4 @@ Allowed Zones :: A user configurable option that tweaks the algorithm to disable
 [[zmd]]
 ### Zone Measure Diagram
 
-image::zone-measure-legend2.png[]
+image::zone-measure-legend.png[]
