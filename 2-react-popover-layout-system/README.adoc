@@ -55,7 +55,7 @@ _Note: For a discussion on why change thresholds are useful see <<app-c>>._
 
 ##### Example
 
-In the following diagram (<<zmd, legend>>) see how the measuring and ranking play out. Interestingly, the right zone has greater remaining length available than the bottom zone yet is ranked lower. This is because the right zone would have Popover exceed frame bounds while bottom would not. The right zone is an example of second class.
+In the following diagram (<<zmd, see glossary for how to read these>>) see how the measuring and ranking play out. Interestingly, the right zone has greater remaining length available than the bottom zone yet is ranked lower. This is because the right zone would have Popover exceed frame bounds while bottom would not. The right zone is an example of second class.
 
 image::zone-measure.png[]
 
@@ -95,9 +95,9 @@ image::tip-centering.png[]
 
 At this point the optimal position of Popover as governed by our ruleset has been reached. Should the dimensions of any component change (including Popover itself), or should the coordinates of Target or Frame change, then we will need to rerun this algorithm again to find Popover's next optimal position.
 
-A serious limitation of the current system is that it only works for components that are rectangles. Support for arbitrarily shaped components would probably greatly increase the complexity of this system, but it sure sounds like fun to try and do it :). Maybe it would borrow from graphics layout ideas used in video games, but I'm really not sure.
+One limitation of the current system is that it only works for rectangular shaped components. Support for arbitrarily shapes would probably greatly increase the complexity of this system, but it sure sounds like a fun challenge :). Maybe it would borrow ideas from layout and graphics systems in video games?!
 
-Another nice area for future work would be live interactive diagrams. I am inspired by Bret Victor's essays!
+Another nice area for future work would be live interactive diagrams. I am inspired by http://worrydream.com/#!2/LadderOfAbstraction[Bret Victor's essays]!
 
 
 
@@ -147,8 +147,6 @@ image::change-threshold-100.png[]
 
 ### Components
 
-image::anatomy-components.png[]
-
 Target :: The aim of Popover.
 
 Frame :: The bounding box that Popover should remain within.
@@ -182,4 +180,4 @@ Allowed Zones :: A user configurable option that tweaks the algorithm to disable
 [[zmd]]
 ### Zone Measure Diagram
 
-image::zone-measure-legend.png[]
+image::zone-measure-legend2.png[]
