@@ -3,7 +3,7 @@
 :sectanchors:
 :toclevels: 99
 
-# The layout system powering React Popover
+# Zoner: The layout engine powering React Popover
 
 image::zones.png[]
 
