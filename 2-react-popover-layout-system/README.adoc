@@ -63,11 +63,23 @@ image::zone-measure.png[]
 
 ### Phase 2: Position the Popover
 
-With the optimal zone found we can now calculate the best position for Popover within it. Our algorithm looks for the position of Popover that would see its main axis matched to that of Target.
+#### Match cross axis center
+
+With the optimal zone found we can now calculate the best position for Popover within it. Our algorithm looks for the position of Popover that would see its cross axis center matched to the cross axis center of Target _within Frame_.
 
 image::positioning.png[]
 
-When it is not possible for Popover to remain within Frame bounds then one of several fallback strategies may be applied. Exactly which one depends upon what the user has chosen ahead of time.
+#### Handling cropped Target
+
+Center of Target _within Frame_ means that any Target length outside the Frame bounds is ignored when calculating its center.
+
+image::positioning-in-frame-center.png[]
+
+This approach to centering generally produces more harmonious results in the author's opinion. However should use-cases arise where absolute center is more desirable I think support for configuration here would be relatively easy.
+
+#### Handling cropped Popover
+
+When matching center points would make it impossible for Popover to remain within Frame bounds then one of several strategies may be applied. Exactly which one depends upon what the user has chosen ahead of time.
 
 ##### Mode Bounded
 
@@ -77,7 +89,7 @@ image::positioning-bounded.png[]
 
 ##### Mode Unbounded
 
-Frame bounds are ignored.
+Frame bounds are ignored. Note that Popover is still positioned to the Target's in-Frame center; It may turn out that in this mode absolute center is actually more desirable, but I'm not sure. Maybe my opinion will change with feedback and examples from real-world usage.
 
 image::positioning-unbounded.png[]
 
