@@ -1,4 +1,11 @@
-/* CSS for website */
 .page-inner {
   max-width: 60rem;
+}
+
+.divider,
+/* The link back to the gitbook */
+.summary > li:last-child,
+/* The link back to the book's gitbook book page */
+.summary > li:not(.chapter):not(.divider):not(.header) {
+  display: none;
 }
