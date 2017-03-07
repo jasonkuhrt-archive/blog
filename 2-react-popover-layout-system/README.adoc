@@ -7,7 +7,7 @@
 
 image::zones.png[]
 
-This is a technical document regarding Forto, the layout system powering react-popover. If you are generally curious about what react-popover is, why it exists, etc. then you may want to read a link:/1-react-popover-history/README.adoc[recent article detailing its back-story].
+This is a technical document regarding Forto, the layout engine powering react-popover. If you are generally curious about what react-popover is, why it exists, etc. then you may want to read a link:/1-react-popover-history/README.adoc[recent article detailing its back-story].
 
 toc::[]
 
@@ -27,15 +27,13 @@ The first major action Forto takes is to determine which zone to position Popove
 
 ##### Step 1: Measure
 
-By default all zones are eligible for consideration but the user is able to change this selection explicitly using one of the following choices: vertical, horizontal, before, after, top, bottom, left, right.
+Measuring a zone produces what I call a zone _fit_. By default all zones are eligible for consideration but the user is able to limit this to one of the following subsets: vertical, horizontal, before, after, top, bottom, left, right.
 
-For each eligible zone Forto subtracts Popover's height and width from the zone's height and width. When doing this Forto also has to correctly account for the Tip's main-axis length. The result is knowing how much spare space each zone would have along either dimension after fitting Popover. It is referred to as the zone's _fit_.
-
-_Note: See <<app-b>> for a deep dive on a fun edge case I encountered while spiking the initial implementation two years ago._
+For each eligible zone Forto subtracts Popover's height and width from that of zone. When doing this we must also ensure that Tip's main length is added to Popover's main length (<<app-b, See appendix b for a deep dive on what can happen if we don't do this>>). The result is knowing how much spare space each zone would have along either dimension after fitting Popover.
 
 ##### Step 2: Rank
 
-Forto groups the measured zones into first or second class. First class zones are those whose fit is positive on both dimensions. Second class zones are those whose fit is negative on one or both dimensions.
+Forto groups the zones into first or second class. First class zones are those whose fit is positive on both dimensions. Second class zones are those whose fit is negative on one or both dimensions.
 
 If there are first class zones then Forto picks the one with the greatest area. The only exception is if the user has specified a preferred zone which is in the first class set and whose threshold of not having another zone of n-percent greater area is met; In which case the preferred zone is used (even if it does not have the greatest area).
 
@@ -79,7 +77,7 @@ This approach to centering generally produces more harmonious results in the aut
 
 #### Handle cropped Popovers
 
-When matching center points would make it impossible for Popover to remain within Frame bounds then one of several strategies may be applied. Exactly which one depends upon what the user has chosen ahead of time.
+As we just saw a hint of above in the diagram, if matching cross-axis centers would cause Popover to exceed Frame bounds then one of several strategies may be applied. Exactly which one depends upon what the user has chosen ahead of time.
 
 ##### Mode Bounded
 
@@ -95,7 +93,7 @@ image::positioning-unbounded.png[]
 
 ### Phase 3: Position the Tip
 
-With the Popover's position found within the optimal zone Forto can now proceed with the last step: position the Tip. To do this correctly Forto assumes that Tip is pointing upward at zero degrees rotation. Its layout rules are as follows:
+With the Popover's optimal position found within the optimal zone Forto can now proceed with the last step: position the Tip. To do this correctly Forto assumes that Tip is pointing upward at zero degrees rotation. Its layout rules are as follows:
 
 . Face the target.
 . Along main-axis: position between Popover and Target.
@@ -105,15 +103,15 @@ image::tip-centering.png[]
 
 ## Conclusion
 
-At this point the optimal position of Popover as governed by our ruleset has been reached. Should the dimensions of any component change (including Popover itself), or should the coordinates of Target or Frame change, then Forto will need to run again to find Popover's revised position.
+At this point the optimal position of Popover as governed by our ruleset has been reached. Should the dimensions of any component change (including Popover itself), or should the coordinates of Target or Frame change, then Forto will need to run again to find Popover's revised optimal position.
 
 ### Future Work
 
 One current limitation of Forto is that it only supports rectangular shaped components. Support for arbitrarily shapes would probably greatly increase Forto's complexity, though it sure sounds like a fun challenge :). It wouldn't surprise me if I were to find relevant algorithm(s) for the arising problems from mature graphics-heavy industries like video games.
 
-Another limitation is that Tip is a "hardcoded" idea. Forto could would become significantly more general if it could be factored out somehow. It would be easy enough to add a configuration option to simply disable Tip, but while pragmatic that's not my ideal. Instead I would prefer to make Forto fully unaware of Tip, yet somehow make it easy to _compose_ the idea of Tip into an instance of this system. Such a solution would probably tend toward a general layout solver (e.g. https://gridstylesheets.org[GSS]) in which case my ideal solution would be, at best, a long-term goal.
+Another limitation is that Tip is a "hardcoded" idea. Forto would become considerably more general if it could be factored out somehow. It would be easy enough to add a configuration option to simply disable Tip, but while pragmatic that's not my ideal. Instead I would prefer to make Forto fully unaware of Tip, yet somehow make it easy to _compose_ the idea of Tip into an instance of this system. Such a solution would probably tend toward a general layout solver (e.g. https://gridstylesheets.org[GSS]) in which case my ideal solution would be, at best, a long-term goal.
 
-One meta improvement I'm interested in is to create enhanced versions of the diagrams found in this article, such that they are interactive and "live" a la http://worrydream.com/#!2/LadderOfAbstraction[Bret Victor's essays]. Forto is a complex system that can lead to all sorts of results for all sorts of reasons. Static diagrams do not communicate this well which I think may slow or prevent deep understanding and new insights amongst both users and myself.
+One meta improvement that interests me is to enhance some of the diagrams I've created for this document into interactive visualizations a la http://worrydream.com/#!2/LadderOfAbstraction[Bret Victor's essays]. Forto is a fairly nuanced system that can lead to many different results depending upon the arrangement. As such, static diagrams cannot capture the gamut of scenarios or provide live feedback on how changes to the inputs affect the output.
 
 
 
@@ -126,7 +124,7 @@ image::examples.png[]
 [[app-b]]
 ### Appendix B: Factoring in Tip's main length, an interesting edge case
 
-Observe that Tip length affects either height or width of Popover depending upon the orientation of a zone. As such zones of opposite orientation manifest slightly different Popover dimensions. If not handled right this can trigger an infinite layout loop between two second-class zones of opposite orientation. This is because said change in dimension will affect the percentage of Popover cropped and in turn lead to always another zone appearing superior than the current one. The following diagram helps illustrate this:
+Observe that Tip length affects either height or width of Popover depending upon the orientation of a zone. As such zones of opposite orientation manifest slightly different Popover dimensions. If not handled right this can trigger an infinite layout loop between two second-class zones of opposite orientation. This could happen when said change in dimension would affect the percentage of Popover cropped and in turn lead to always another zone appearing superior than the current one. The following diagram helps illustrate this:
 
 image::infini-loop.png[]
 
@@ -135,7 +133,7 @@ image::infini-loop.png[]
 3. Popover positioned. Dimensions change because of Tip movement
 4. A new optimal zone in first class is detected; Go to 1
 
-My solution to this problem is to make sure Forto always adds the Tip's main-axis length to Popover's main-axis length when calculating a zone's fit rank. For example for top zone add Tip length to the Popover height; for right zone add Tip length to Popover width; etc. The scenario from before now looks like:
+As we saw Forto gets around this by adding the Tip's main-axis length to Popover's main-axis length when calculating a zone's rank. Therefore in actuality the scenario from before, corrected, looks like:
 
 image::infini-loop-fixed.png[]
 
@@ -167,7 +165,7 @@ image::change-threshold-100.png[]
 
 Target :: A rectangular thing. The aim of Popover.
 
-Frame :: The rectangular bounding box that Popover should remain within.
+Frame :: The rectangular thing that Popover should remain within.
 
 Popover :: The rectangular thing Forto is optimally positioning in relation to Target and Frame.
 
@@ -183,9 +181,11 @@ Main/Cross Axes :: Relative axes whose concrete orientation depend upon Popover'
 
 Before/After Sides :: A slightly more general way to think about rectangle sides. _Before_ refers to top or left. _After_ refers to bottom or right.
 
-Zone :: A rectangle between the inner frame and outer Target. There are four zones between Target and Frame.
+Zone :: A rectangle between the inner Frame and outer Target. There are four zones between Target and Frame since there are four sides to a rectangle which both Target and Frame are.
 
 Zone Fit :: How well a given zone fits the Popover. Determined by subtracting the Popover's dimensions from that of zone's.
+
+Rezone :: Move the Popover from one zone to another due to changes in the arrangement.
 
 First Class Zone :: A zone whose fit is positive on both dimensions.
 
