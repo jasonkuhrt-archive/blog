@@ -1,0 +1,26 @@
+# SNI, TLS & CloudFront
+
+2017 March 24
+
+I spent much of my last 16 or so working hours with a colleague trying to understand why using CloudFront as a server in an HAProxy backend over https was not working.
+
+The problem was that HAProxy would return a 503 error upon trying to route any HTTPS traffic to CloudFront. We determined the issue was isolated to HTTPS when we reverted our architecture briefly to HTTP only to find it all worked.
+
+We observed that we could `curl` directly against CloudFront with success. And HAProxy could route HTTPS traffic to another backend with a non-CloudFront server just fine too. We continued our poking around for a while, trying to be methodical but sometimes straying within the haze of disbelief and frustration. We pursued many hypotheses such as "oh could the alpine image for HAProxy be missing stock Certificate Authority (CA) certificates??". I almost gave up a few times. At those times I resorted to breaks usually in the form or water, snacks, and walks.
+
+Late in the day my colleague said something like "Hey... what do you know about SNI?". He had gone poking around in the CloudFront settings footnote:[https://aws.amazon.com/about-aws/whats-new/2014/03/05/amazon-cloudront-announces-sni-custom-ssl/[2014 Amazon announcement]] and found a configuration about whether to only accept SNI-enabled clients or also support clients without SNI (for a smooth $600/mo). Neither of us could recall ever dealing with this term or technology. SNI turned out to stand for
+https://en.wikipedia.org/wiki/Server_Name_Indication[Server Name Indication]. We had been without leads for a little while by now, so we felt bullish this this was The One.
+
+We quickly got up to speed on SNI. It is an extension to the TLS protocol published in 2003 whose gist is pretty simple: The TLS handshake is extended such that the server requires the client to indicate which host (name) it is interested in reaching (otherwise the handshake fails). The benefit of this is that the server can host multiple TLS certificates rather than needing an ip/port combo per TLS certificate. So for example three clients securely connecting to https://foo.com, https://bar.com, and https://qux.com respectively can all do so against a single ip/port. And since this all happens at https://en.wikipedia.org/wiki/OSI_model[layer 4 in the ISO model] all layer 7 protocols can benefit (HTTP, FTP, SMTP, HTTP, ...). This seems like an actually pretty cool feature for its simplifying capabilities, but I attest that at the time any such coolness was temporarily wasted on me in the face or my ire: Damn SNI! :).
+
+The following is an example of how we updated our HAProxy to use SNI. We exposed the actual host name to use as an env variable, though we will probably change this to `req.hdr(Host)` which will pull it from the client request (that is, the client request to HAProxy).
+
+```
+server hybrid_server ${HYBRID_STACK_HOST}:443 sni env(SNI_HOST) ssl verify none check cookie hybridStack
+```
+
+With great relief (to us) this worked. Our many test curls aimed at HAProxy finally started to return `200` status codes. One issue remained however. We had to disable `check` (periodic layer 4 health checks made by HAProxy to the backend servers). We had a problem where at boot HAProxy would say the backend servers were down because they failed the "SSL handshake". What was going on?!
+
+Luckily for us the challenge of using SNI-requiring servers in HAProxy backends was treaded enough that we found a http://discourse.haproxy.org/t/can-1-6-do-sni-on-backend/278[forum thread] with discussion about this very problem. It turns out that `sni` and `check` are features that do not integrate together and so checks made over TLS still fail if the server requires SNI. The solution we found out was to configure HAProxy to use an external health check. Simple enough. We updated our docker to install curl, copied in a simple bash script at build time, and called it from within HAProxy at runtime.
+
+Success! It only took ~18 hours... but at least we solved the problem and now know what SNI is. 🐪

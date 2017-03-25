@@ -1,6 +1,10 @@
 * link:README.adoc[Introduction]
 
-## 2017
+## Essays
 
 * link:essays/react-popover-history/README.adoc[Jan – React Popover History]
 * link:essays/forto/README.adoc[Mar – Forto]
+
+## Logs
+
+* link:logs/sni-tls-cloudfront/README.adoc[SNI, TLS & CloudFront]
