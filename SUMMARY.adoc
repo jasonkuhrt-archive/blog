@@ -7,4 +7,5 @@
 
 ## Logs
 
+* link:logs/testem-karma-simplicity/README.adoc[Karma, Testem, Non-Simplicity]
 * link:logs/sni-tls-cloudfront/README.adoc[SNI, TLS & CloudFront]
