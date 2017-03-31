@@ -1,5 +1,7 @@
 # Karma, Testem, Non-Simplicity
 
+2017 March 30
+
 The other night I was introducing a https://github.com/jasonkuhrt/forto/commit/d272ebde8070897e908954b45571280bbb646523[Dom module in Forto] and wanted to start some tests around this. The existing tests were using https://github.com/facebook/jest[jest] which relies on https://github.com/tmpvar/jsdom[jsdom] for in-memory in-javascript testing against the dom and so I was hoping I would be able to repurpose this existing code. But I quickly discovered that jsdom https://github.com/tmpvar/jsdom/issues/1322[does not actually simulate dom layout] making the tests I was interested in making impossible.
 
 That meant I would have to:
