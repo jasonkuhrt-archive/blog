@@ -1,0 +1,53 @@
+# Untyped JavaScript For Now
+
+In the last few years multiple implementations of typed JavaScript have successfully emerged, namely http://www.typescriptlang.org/[TypeScript] and https://flow.org/[Flow]. I've followed each one loosely and played around with Flow in a few projects.
+
+I have been using Flow in my latest project https://github.com/jasonkuhrt/forto[Forto] for a few weeks now, but tonight that all stops as I have personally concluded typed JavaScript is a net loss for what I do with it. My conclusion has been fuelled primarily by the following three reasons: syntactic damage, project overhead and lack of tooling, not-high-enough-for-me type system expressivity. The last point is most important. Here are just two examples, but many more can be found:
+
+* https://github.com/facebook/flow/issues/34
+* https://github.com/facebook/flow/issues/465
+
+Syntax is also very important to me, and perhaps one of the single most important parts are function signatures. Its difficult for me to accept how just much typed JavaScript destroyed this key area of the programming language:
+
+```
+const optimalZone = (
+  frame : BoundingBox,
+  target : BoundingBox,
+  popover : Size,
+  tip : any
+) : Zone => {
+  return (
+    F.first(
+      rankZones(
+        measureZones(target, frame).map((zone) =>
+          calcFit(popover, tip, zone)
+        )
+      )
+    )
+  )
+}
+```
+```
+const optimalZone = (frame, target, popover, tip) => {
+  return (
+    F.first(
+      rankZones(
+        measureZones(target, frame).map((zone) =>
+          calcFit(popover, tip, zone)
+        )
+      )
+    )
+  )
+}
+```
+
+I would much prefer something akin to Haskell, e.g.:
+
+```
+type  optimalZone : (BoundingBox, BoundingBox, Size, any) => Zone
+const optimalZone = (frame, target, popover, tip) =>
+```
+
+As I have learnt and worked more and more with Haskell, its type system has continued to impress and inspire me. That's not to say I know how to express myself fully in it yet, but I have read and peaked around enough to know that the limitation is current-me, not it. This is different than with typed JavaScript where I can feel the fact that these are ambitious systems  bootstrapped onto a language that was never conceived to have them.
+
+I realize TypeScript is significantly more mature than Flow, and that I have less direct experience with it than Flow, however from what I've read and kept up to date on, I do not think it would ultimately change my conclusion. While I am confident that its tooling and maturity would make up for any project overhead. I would still experience the aforementioned syntactic damage, and expressivity would still be an issue, e.g. https://github.com/Microsoft/TypeScript/issues/364.
