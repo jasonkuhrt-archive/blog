@@ -7,6 +7,7 @@
 
 ## Logs
 
+* link:logs/yarn-publish-woes/README.adoc[Yarn Publish Woes]
 * link:logs/untyped-javascript-for-now/README.adoc[Untyped JavaScript For Now]
 * link:logs/testem-karma-simplicity/README.adoc[Karma, Testem, Non-Simplicity]
 * link:logs/sni-tls-cloudfront/README.adoc[SNI, TLS & CloudFront]
