@@ -1,0 +1,16 @@
+
+## About
+
+TIL standards for "Today I Learnt". The idea is by recording small things learnt their learning will be better retained. In the large I think it also provides a nice rough way of tracking progress every once in a while, and finding patterns in one's self that would otherwise be missed. This idea is not mine, but rather what I've seen others do e.g. https://github.com/jbranchaud/til/commits/master[here] https://github.com/thoughtbot/til[here] and https://github.com/milooy/TIL[here]. I think its a nifty idea worth emulating.
+
+Items below are ordered latest to oldest. Look at the git history for the actual dates.
+
+## TIL
+
+* https://dgraph.io[dgraph] has enough power in its query language to apply both collaborative-based and content-based filtering strategies https://blog.dgraph.io/post/recommendation[link] https://blog.dgraph.io/post/recommendation2/[link].
+
+* _collaborative-based filtering_ is a broad strategy for recommending things based upon matching like-users and then recommending to one based on another(s).
+
+* _cold-start_ problem refers to being unable to integrate a new user into collaborative-based filtering for lack of data with that user.
+
+* _content-based filtering_ is a broad strategy for recommending things based on their similarity to another given thing.
