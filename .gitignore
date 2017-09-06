@@ -1,2 +1,5 @@
 .DS_Store
 _book
+package.json
+yarn.lock
+node_modules
