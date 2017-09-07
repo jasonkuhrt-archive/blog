@@ -7,6 +7,82 @@ Items below are ordered latest to oldest. Look at the git history for the actual
 
 ## TIL
 
+* learnt about the following `dgraph` `mutation` today.
++
+```
+mutation {
+  set {
+   _:cat <name> "Millhouse" .
+   _:cat <color> "Black" .
+   _:cat <age> "0.7"^^<xs:float> .
+
+   _:human <name> "Kaley" .
+   _:human <age> "22"^^<xs:float> .
+   _:human <favorite_food> "chocolate" .
+
+   _:human <owns> _:cat .
+  }
+
+  schema {
+   name: string @index .
+  }
+}
+```
+** `mutation` is for changing data in the graph or changing the graph schema
+** `set` is for mutations that insert triples into the graph
+** the strange syntax `^^<xs:float>` is apparently how a value is typed as a float...
+
+* about `dgraph` triples
+** triples are specified according the W3C standard https://www.w3.org/TR/n-quads/[RDF N-Quad format]
+** their format is `<subject> <predicate> <object> .` `subject` is always a node. `object` is either a `node` or a `value` (also know as literal). `predicate` is a directed edge from `subject` to `object`, the value here is the edge name. A given edge must always point to a consistent type (in effect the edge type). A `.` is present because of the spec apparently less because of need on dgraph side https://dgraph.slack.com/archives/C13LH03RR/p1504754827000129[link]
+
+* `blank node` is written `_:identifier` in a mutation. Used to identify a node within a mutation. Outside a particular mutation the identifiers have no existance. `_` will be replaced by dgraph with an automatically generated 64bit unique ID. These IDs are available in the mutation return result:
++
+```
+{
+  "data": {
+    "code": "Success",
+    "message": "Done",
+    "uids": {
+      "foo": "0x2712",
+      "qux": "0x2713",
+      "bar": "0x2714"
+    }
+  }
+}
+```
+
+* links: https://docs.dgraph.io/query-language/#mutations[mutation docs], https://docs.dgraph.io/master/guides/#adding-data-to-dgraph[guide/intro to mutations]
+
+* in `dgraph` schema types are defined globally without any ability to nest into records. https://dgraph.slack.com/archives/C13LH03RR/p1504755357000113[link]. For example this would fail:
++
+```
+mutation {
+  schema {
+    foo {
+      bar: string .
+    }
+  }
+}
+```
++
+but this would work:
++
+```
+mutation {
+  schema {
+    bar: string .
+  }
+}
+```
+
+
+
+
+* `dgraph` supports pagination which can be used as the basis for doing batch work across an entire graph. https://dgraph.slack.com/archives/C13LH03RR/p1504745800000004[slack link], https://docs.dgraph.io/master/query-language/#pagination[pagination docs link]
+
+'''
+
 * https://dgraph.io[dgraph] has enough power in its query language to apply both collaborative-based and content-based filtering strategies https://blog.dgraph.io/post/recommendation[link] https://blog.dgraph.io/post/recommendation2/[link].
 
 * _collaborative-based filtering_ is a broad strategy for recommending things based upon matching like-users and then recommending to one based on another(s).
