@@ -1,0 +1,14 @@
+
+# Incremental Feedback
+
+2017 September 10
+
+Sometimes people think of me as being anti-process. But this is not quite right. I am anti-overhead; Process for process's sake.
+
+At https://www.ssense.com[ssense] where I currently work agile is practiced in the form of scrum. Now I cannot actually recite the exact tenants of scrum but I am pretty sure one of the core tenants of _any_ agile methodology is _incremental value_. I believe in this tenant. I accept process that supports this tenant.
+
+I say _incremental value_ because that's the term many of my colleagues use (scrum maters, product managers, and so on). But for me the mentality that I really believe in is actually *_incremental feedback_*. This is where I see the most benefit. Mistakes will be made and sometimes business value will not actually be delivered. Sometimes business value will even be lost. But with diligence, feedback can be a steady a constant, and if I am a good applied scientist, that should be the basis for optimizing my incrementally delivered value.
+
+Lastly a rambling thought on feedback itself.
+
+Feedback, the considered kind, is rare and valuable. Since it can be _wrong_ it means work still must be done to analyze, integrate, etc. the received information. The greater the source of the feedback (mentor, master, etc.) the less necessary this probably is. But of course fresh insights from juniors, jaded thoughts from masters, and so on must not be discounted, so perhaps in the ideal end, there is only ever a fully critical ear to all levels of feedback.
