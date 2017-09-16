@@ -7,6 +7,24 @@ Items below are ordered latest to oldest. Look at the git history for the actual
 
 ## TIL
 
+* found out that asciidoc does not support strikethough in a way that supports Github (or viceversa) https://github.com/asciidoctor/asciidoctor/issues/1030[link] https://github.com/christiangalsterer/bitbucket-asciidoc-plugin/issues/15[link]. This prevented me from being able to format a log title in the way I wanted.
+
+* Amazon Alexa is a kind of voice-based interface not unlike Apple Siri.
+** Amazon Echo is a hardware product line that makes Alexa convenient to use
+** Developers can "teach Alexa skills" which is analogus to e.g. writing iOS apps. teach -> write, skill -> app
+** Alexa skills are configured with an amazon developer account, then implemented. The skill's interaction model is defined in this configuration layer, e.g. what utterances can be used.
+** `Invocation Name` is the name given to enter your skill from alexa. For example `essence` will enter the `ssense` skill
+** Each skill has multiple `intents`. These are like functions or endpoints in your skill. You defined them as a developer.
+** Each intent has multiple `utterances`. These are ways the user can speak to execute the intent.
+** There is another concept called `slots` which are for parameters in intents. But I have not actually played with these yet.
+** There are different APIs available for developers to use to build skills. For highly custom skills there is a Custom API which can POST intents to any host running an HTTPS server.
+** links: https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/getting-started-guide[Alexa Skills entry point for developers], https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/build-skills-for-echo-show#display-and-interaction-features-on-echo-show[Amazon Echo Show entry point for developers], https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/overviews/understanding-custom-skills[Custom API], https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/alexa-skills-kit-interface-reference[JSON Interface Reference for Custom Skills], https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/display-interface-reference[Display Interface Reference]
+
+* DGraph's https://godoc.org/github.com/dgraph-io/dgraph/client[go client] is their most feature complete one. DGraph's https://github.com/dgraph-io/dgraph/tree/master/cmd/dgraphloader[`dgraphloader`] is built on top of it.
+
+
+'''
+
 * learnt about the following `dgraph` `mutation` today.
 +
 ```
