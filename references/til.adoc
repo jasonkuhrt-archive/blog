@@ -7,6 +7,25 @@ Items below are ordered latest to oldest. Look at the git history for the actual
 
 ## TIL
 
+Fri Sep 15
+
+* installing dgraph https://docs.dgraph.io/get-started/#from-install-scripts[via simple bash script] makes not just `dgraph` available on the command line but also `dgraphloader`.
+* data can be imported and exported out of dgraph using a file format called RDF. RDF stands for https://en.wikipedia.org/wiki/Resource_Description_Framework["resource description framework"]. It is actually a family of specifications maintained by the https://en.wikipedia.org/wiki/World_Wide_Web_Consortium[W3C]. N-Tripples are one of the common serialization formats for RDF data, and not coincidentally as I noted a few days ago tripples are also a W3C specification. The main enlightenment here was that I realized dgraph `set` syntax (`mutate { set { ... }}`) isn't its own design but rather just RDF. In fact the contents of an RDF file can be copy-pasted into this `set` block! It is not clear if the reverse is true. In otherwise RDF may just be a subset of what dgraph `set` can do.
+* In dgraph there are no properties on nodes, just named edges to types of data
+* In dgraph up until today it was only possible to have multiple outgoing node edges of the same name to other _nodes_, but not to other _values_. So for example if you had a product node it was not possible to attach multiple `image` edges to URL values. Each attachment would just override the previous one. On the other hand a person node could have multipe `friend` edges to other person nodes. However today a feature landed in `master` that allows multiple same-named edges to values just like nodes! https://dgraph.slack.com/archives/C13LH03RR/p1505509178000026[link]
+* dgraph has an interface for making queries and visualizing their results +
++
+image::./assets/dgraph-ui.png[]
+* a dgraph schema is a non-nested map of edge names to types. The types are the type of value pointed _to_ by that edge. There are no namespaces. when we add `@index` to the typing we're making _any_ node with an _outgoing_ edge of the respective name available as an entry point (e.g. `foobar(func: allofterms(some_edge_here, "some value here"))`) or for filtering (e.g. `friend @filter(allofterms(some_edge_here, "some value here")) { ... }`).
+* dgraph `@filter` and entrypoint are two syntaxes for doing the same thing it seems e.g. they each accept the same functions `allofterms` `anyofterms` `eq` ...
+* When specifying a field in the schema design `@reverse` makes it possible to use `~field_name_here { ... }` in queries which will follow the edge back to where its pointing _from_. `~` is the special part that signifies to travel the edge in reverse. For example given a `product` node and `category` node and a `category` _edge_ from product to `category` it would be possible to do `~category { ...product fields here... }` within a category context in a query to get the product that points to it.
+* given the lack of namespacing in dgraph schemas a convention has emerged to name edges with a prefix of the node type. For example in a movies database to differentiate directors from actors the schema used edge names `director.film` and `actor.film`. Its not clear how far this pattern should go. It seems like a case-by-case decision.
+
+
+
+'''
+Sun Sep 10
+
 * found out that asciidoc does not support strikethough in a way that supports Github (or viceversa) https://github.com/asciidoctor/asciidoctor/issues/1030[link] https://github.com/christiangalsterer/bitbucket-asciidoc-plugin/issues/15[link]. This prevented me from being able to format a log title in the way I wanted.
 
 * Amazon Alexa is a kind of voice-based interface not unlike Apple Siri.
@@ -24,6 +43,7 @@ Items below are ordered latest to oldest. Look at the git history for the actual
 
 
 '''
+Wed Sep 6
 
 * learnt about the following `dgraph` `mutation` today.
 +
@@ -100,6 +120,7 @@ mutation {
 * `dgraph` supports pagination which can be used as the basis for doing batch work across an entire graph. https://dgraph.slack.com/archives/C13LH03RR/p1504745800000004[slack link], https://docs.dgraph.io/master/query-language/#pagination[pagination docs link]
 
 '''
+Tue Sep 5
 
 * https://dgraph.io[dgraph] has enough power in its query language to apply both collaborative-based and content-based filtering strategies https://blog.dgraph.io/post/recommendation[link] https://blog.dgraph.io/post/recommendation2/[link].
 
