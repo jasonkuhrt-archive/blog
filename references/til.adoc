@@ -7,6 +7,69 @@ Items below are ordered latest to oldest. Look at the git history for the actual
 
 ## TIL
 
+Sun Sep 17
+
+* In Kubernetes it is possible to maintain persistent data
+
+** The core concepts are:
+. `volume classes` (`vc`)
+. `persistent volumes` (`pv`) based on `vc`
+. persistent volume claims` (`pvc`) based on `pvc`
+. `pod` specs that specify volumes based on `pvc`s
+. `container` specs (within pod specs) that specify `volumeMounts` based on `pod` `volumes`
+
+** So each of these is based upon the former until `vc` hits the raw layer of whatever the kubernetes is hosted upon.
+** Since Kubernetes 1.6 it has been possible to create `pvc`s directly without needing to first create `pv`s. This is referred to as dynamic provisioning. http://blog.kubernetes.io/2017/03/dynamic-provisioning-and-storage-classes-kubernetes.html[link]
+** More about the concept can be read on the https://kubernetes.io/docs/concepts/storage/volumes/[storage docs]. The third sub-section just links to a blog post, so incomplete?
+** A blog post going over the topic in an end-to-end example can be found http://blog.bigbinary.com/2017/04/12/using-kubernetes-persistent-volume-for-persistent-data-storage.html[here]
+** Another example is https://kubernetes.io/docs/tasks/configure-pod-container/configure-persistent-volume-storage/[one section on the k8s task-oriented docs]
+** Example:
++
+```
+❯ kc get pv
+NAME                                       CAPACITY   ACCESSMODES   RECLAIMPOLICY   STATUS    CLAIM           STORAGECLASS   REASON    AGE
+pvc-46c2c0df-9c19-11e7-a0d1-0800271d32bc   1Gi        RWO           Delete          Bound     default/mypvc   standard                 47m
+
+❯ kc get pvc
+NAME      STATUS    VOLUME                                     CAPACITY   ACCESSMODES   STORAGECLASS   AGE
+mypvc     Bound     pvc-46c2c0df-9c19-11e7-a0d1-0800271d32bc   1Gi        RWO           standard       47m
+
+❯ cat ./deployment.yaml
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: dgraph
+  labels:
+    app: dgraph
+spec: # ReplicaSet
+  replicas: 1
+  template: # Pod
+    metadata:
+      labels:
+        app: dgraph
+    spec:
+      volumes:
+        - name: dgraph
+          persistentVolumeClaim:
+            claimName: mypvc
+      containers:
+        - name: dgraph
+          image: dgraph/dgraph:latest
+          ports:
+            - name: ui
+              containerPort: 8080
+            - name: client
+              containerPort: 9080
+          command:
+            - dgraph
+          args:
+            - -bindall=true
+            - -memory_mb=2048
+          volumeMounts:
+            - name: dgraph
+              mountPath: /dgraph
+```
+
 Fri Sep 15
 
 * installing dgraph https://docs.dgraph.io/get-started/#from-install-scripts[via simple bash script] makes not just `dgraph` available on the command line but also `dgraphloader`.
