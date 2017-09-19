@@ -7,6 +7,25 @@ Items below are ordered latest to oldest. Look at the git history for the actual
 
 ## TIL
 
+Mon Sep 18
+
+* running a dgraph cluster
+** multiple dgraph instances can run together in a cluster to scale read/write performance as well as provide high availability of the data
+** additional configuration steps are necessary to setup a cluster
+** each instance must be instructed to take on certain `group`s of predicates `--groups`
+** a predicate-to-group mapping spec must be given to each instance `--group_conf`
+** The mapping spec has some basic features like edge-name-prefix matching and `fp` variable for the so-called fingerprint of an edge
+
+* in Kubernetes a ConfigMap resource type allows mounting file contents at file names given by the resource spec key names. for example:
++
+```
+spec:
+  <filename_1_here>: |
+    file 1 contents here!
+  <filename_2_here>: |
+    file 2 contents here!
+```
+
 Sun Sep 17
 
 * In Kubernetes it is possible to maintain persistent data
