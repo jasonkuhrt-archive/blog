@@ -7,6 +7,66 @@ Items below are ordered latest to oldest. Look at the git history for the actual
 
 ## TIL
 
+Tue Sep 19
+
+* In Go command line flags are processed such that `-a=x` `--a=x` `-a x` `--a=x` all mean the same thing. The only exception is that booleans `true`/`false` cannot be used with the form `-a x` or `--a x`.
+
+* It turns out in dgraph the `--groups` flag doesn't require quotes around the arguments so `--groups="0,1"` can be entered as just `--groups=0,1`. This point matters because in the k8s deployment spec the former with quotes leads to a parse error in dgraph! This wasted several hours of my time...
++
+```
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: dgraph
+  labels:
+    app: dgraph
+spec: # ReplicaSet
+  replicas: 1
+  template: # Pod
+    metadata:
+      labels:
+        app: dgraph
+    spec:
+      volumes:
+        - name: group-mappings
+          configMap:
+            name: dgraph-group-mappings.conf
+        - name: dgraph
+          persistentVolumeClaim:
+            claimName: mypvc
+      containers:
+        - name: dgraph
+          image: dgraph/dgraph:latest
+          ports:
+            - name: ui
+              containerPort: 8080
+            - name: client
+              containerPort: 9080
+          command:
+            - dgraph
+          args:
+            - --group_conf=/dgraph-config/group-mappings
+            - --groups="0,1"
+            - --idx=1
+            - --bindall=true
+            - --memory_mb=2048
+          volumeMounts:
+            - name: dgraph
+              mountPath: /dgraph
+            - name: group-mappings
+              mountPath: /dgraph-config
+```
+```
+❯ kc logs dgraph-3594762630-2bfm3
+
+Dgraph version   : v0.8.1
+Commit SHA-1     : 8ea4b0a5
+Commit timestamp : 2017-09-18 10:56:37 +1000
+Branch           : HEAD
+
+2017/09/20 01:39:09 Unable to parse 'groups' configuration
+```
+
 Mon Sep 18
 
 * running a dgraph cluster
