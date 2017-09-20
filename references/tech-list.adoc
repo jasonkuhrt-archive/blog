@@ -1,3 +1,6 @@
+* https://kubernetes.io
+** http://kubernetesbyexample.com
+
 * https://istio.io
 * https://github.com/Azure/draft
 
