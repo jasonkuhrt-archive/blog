@@ -11,6 +11,17 @@ Items below are ordered latest to oldest. Look at the git history for the actual
 
 * In Go command line flags are processed such that `-a=x` `--a=x` `-a x` `--a=x` all mean the same thing. The only exception is that booleans `true`/`false` cannot be used with the form `-a x` or `--a x`.
 
+* It turns out that in k8s deployment configs `args` field (inside container spec) given flags with spaces between name and value does not work (neither would if we wrote this in `["...", ...]` style too):
++
+```
+  args:
+    - --group_conf /dgraph-config/group-mappings
+    - --groups "0,1"
+    - --idx 1
+    - --bindall=true
+    - --memory_mb 2048
+```
+
 * It turns out in dgraph the `--groups` flag doesn't require quotes around the arguments so `--groups="0,1"` can be entered as just `--groups=0,1`. This point matters because in the k8s deployment spec the former with quotes leads to a parse error in dgraph! This wasted several hours of my time...
 +
 ```
@@ -56,6 +67,7 @@ spec: # ReplicaSet
             - name: group-mappings
               mountPath: /dgraph-config
 ```
++
 ```
 ❯ kc logs dgraph-3594762630-2bfm3
 
