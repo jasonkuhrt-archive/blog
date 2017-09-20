@@ -7,7 +7,7 @@ Items below are ordered latest to oldest. Look at the git history for the actual
 
 ## TIL
 
-Tue Sep 19
+**Tue Sep 19**
 
 * In Go command line flags are processed such that `-a=x` `--a=x` `-a x` `--a=x` all mean the same thing. The only exception is that booleans `true`/`false` cannot be used with the form `-a x` or `--a x`.
 
@@ -67,7 +67,8 @@ Branch           : HEAD
 2017/09/20 01:39:09 Unable to parse 'groups' configuration
 ```
 
-Mon Sep 18
+'''
+**Mon Sep 18**
 
 * running a dgraph cluster
 ** multiple dgraph instances can run together in a cluster to scale read/write performance as well as provide high availability of the data
@@ -86,7 +87,7 @@ spec:
     file 2 contents here!
 ```
 
-Sun Sep 17
+**Sun Sep 17**
 
 * In Kubernetes it is possible to maintain persistent data
 
@@ -149,7 +150,7 @@ spec: # ReplicaSet
               mountPath: /dgraph
 ```
 
-Fri Sep 15
+**Fri Sep 15**
 
 * installing dgraph https://docs.dgraph.io/get-started/#from-install-scripts[via simple bash script] makes not just `dgraph` available on the command line but also `dgraphloader`.
 * data can be imported and exported out of dgraph using a file format called RDF. RDF stands for https://en.wikipedia.org/wiki/Resource_Description_Framework["resource description framework"]. It is actually a family of specifications maintained by the https://en.wikipedia.org/wiki/World_Wide_Web_Consortium[W3C]. N-Tripples are one of the common serialization formats for RDF data, and not coincidentally as I noted a few days ago tripples are also a W3C specification. The main enlightenment here was that I realized dgraph `set` syntax (`mutate { set { ... }}`) isn't its own design but rather just RDF. In fact the contents of an RDF file can be copy-pasted into this `set` block! It is not clear if the reverse is true. In otherwise RDF may just be a subset of what dgraph `set` can do.
@@ -166,7 +167,7 @@ image::./assets/dgraph-ui.png[]
 
 
 '''
-Sun Sep 10
+**Sun Sep 10**
 
 * found out that asciidoc does not support strikethough in a way that supports Github (or viceversa) https://github.com/asciidoctor/asciidoctor/issues/1030[link] https://github.com/christiangalsterer/bitbucket-asciidoc-plugin/issues/15[link]. This prevented me from being able to format a log title in the way I wanted.
 
@@ -185,7 +186,7 @@ Sun Sep 10
 
 
 '''
-Wed Sep 6
+**Wed Sep 6**
 
 * learnt about the following `dgraph` `mutation` today.
 +
@@ -262,7 +263,7 @@ mutation {
 * `dgraph` supports pagination which can be used as the basis for doing batch work across an entire graph. https://dgraph.slack.com/archives/C13LH03RR/p1504745800000004[slack link], https://docs.dgraph.io/master/query-language/#pagination[pagination docs link]
 
 '''
-Tue Sep 5
+**Tue Sep 5**
 
 * https://dgraph.io[dgraph] has enough power in its query language to apply both collaborative-based and content-based filtering strategies https://blog.dgraph.io/post/recommendation[link] https://blog.dgraph.io/post/recommendation2/[link].
 
