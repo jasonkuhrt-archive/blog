@@ -11,6 +11,7 @@
 
 ## Logs
 
+* link:logs/http-strict-transfer-security/README.adoc[HTTP Strict Transfer Security]
 * link:logs/incremental-feedback/README.adoc[Incremental Feedback]
 * link:logs/yarn-publish-woes/README.adoc[Yarn Publish Woes]
 * link:logs/untyped-javascript-for-now/README.adoc[Untyped JavaScript For Now]

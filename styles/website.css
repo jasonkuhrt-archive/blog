@@ -9,3 +9,7 @@
 .summary > li:not(.chapter):not(.divider):not(.header) {
   display: none;
 }
+
+.imageblock .content {
+  text-align: center;
+}
