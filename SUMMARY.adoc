@@ -2,7 +2,7 @@
 
 ## References
 
-* link:references/til.adoc[TIL]
+* link:references/today-i-learned.adoc[Today I Learned]
 
 ## Essays
 

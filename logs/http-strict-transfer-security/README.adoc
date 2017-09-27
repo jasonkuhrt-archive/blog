@@ -9,7 +9,7 @@
 
 toc::[]
 
-Over the past few days I've come to know about and apply a technology at work called HTTP Strict Transfer Security (HSTS). This is an extension to the HTTP protocol that increases security for users by preventing user-agents from making insecure requests to the host. It manifests itself as a single response header called `Strict-Transfer`Security` (STS) of the following format:
+Over the past few days I've come to know about and apply a technology at work called HTTP Strict Transfer Security (HSTS). This is an extension to the HTTP protocol that increases security for users by preventing user-agents from making insecure requests to the host. It manifests itself as a single response header called `Strict-Transfer-Security` (STS) of the following format:
 
 ```
 Strict-Transfer-Security: max-age=<seconds>[; includeSubDomains][; preload]

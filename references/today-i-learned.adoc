@@ -1,11 +1,13 @@
 
-## About
+# Today I Learned
 
-TIL standards for "Today I Learnt". The idea is by recording small things learnt their learning will be better retained. In the large I think it also provides a nice rough way of tracking progress every once in a while, and finding patterns in one's self that would otherwise be missed. This idea is not mine, but rather what I've seen others do e.g. https://github.com/jbranchaud/til/commits/master[here] https://github.com/thoughtbot/til[here] and https://github.com/milooy/TIL[here]. I think its a nifty idea worth emulating.
+#### About
 
-Items below are ordered latest to oldest. Look at the git history for the actual dates.
+Also known as TIL, this stream records some of my personal learnings at a granular level. This acts a way to improve retention, share what I have been doing, motivate or help maintain my learning momentum, act as a track record of discipline (or lack thereof), and in the large contribute to a backlog of data that may help me better know thyself in the future.
 
-## TIL
+At the risk of stating the obvious this format is nothing new. Surely most thinkers (great or otherwise) from ancient to modern times have maintained some sort of log, journal, notebook, or whatever. In my contemporary setting I have had direct influence from others practicing this kind of TIL e.g. https://github.com/jbranchaud/til/commits/master[jbranchaud], https://github.com/thoughtbot/til[thoughtbot], https://github.com/milooy/TIL[milooy].
+
+## Entries
 
 **Tue Sep 19**
 
