@@ -30,8 +30,8 @@ Strict-Transfer-Security: max-age=3600; includeSubDomains; preload
 In short the above parameters tell the user-agent the following:
 
 . `max-age` How long in seconds to consider this an HSTS host. If set to `0` then no longer consider this an HSTS host.
-. `includeSubDomains` The HSTS policy applies to all sub domains of the host too
-. `preload` The host should be added to the preload list (will be discussed in detail later)
+. `includeSubDomains` The HSTS policy applies to all sub domains of the host too.
+. `preload` The host should be added to the preload list (will be discussed in detail later).
 
 As a side note I must admit that I find it rather sad, in my own obsessive compulsive way, that here we have a case of `;` delimited params unlike say `Cache-Control` which uses `,`, and that even within this single header schizophrenia insists itself between the kebob and camel case. I can only imagine that had `preload` been expressed in two words snake case would have further crashed the party. These are the paper cuts in an engineer's life.
 
