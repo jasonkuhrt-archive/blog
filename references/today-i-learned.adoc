@@ -9,6 +9,26 @@ At the risk of stating the obvious this format is nothing new. Surely most think
 
 ## Entries
 
+**Sat Oct 7**
+
+* In TypeScript using an interface versus using a type alias changes how the type is represented in IDE type tooltips. With interfaces, tooltips will show the name of the interface. For example `interface Foo {}` will show as `Foo`. However with type aliases the tooltips will contain the contents of the alias. For example `type Foo = { a: string }` will show as `{ a: string }`. I prefer the way interfaces are presented because its much more readable than having the guts of many fields splayed into a tooltip. More details can be found in https://stackoverflow.com/questions/37233735/typescript-interfaces-vs-types[this SO thread]. Noted in this thread are two additional benefits of interfaces in TypeScript:
++
+** An interface can be named in an extends or implements clause, but a type alias for an object type literal cannot.
+** An interface can have multiple merged declarations, but a type alias for an object type literal cannot.
+
++
+However at least one advantage of type aliases in TypeScript is that they can alias anything (primitives, unions, etc.), not just objects.
+
+* http://asciidoctor.org/docs/asciidoc-writers-guide/#attaching-to-an-ancestor-list[AsciiDoctor has support for list continuations of an ancestor list].
+
+* https://mermaidjs.github.io[mermaidjs] seems like an awesome text-based diagraming tool
+
+* regarding https://flow.org/en/docs/types/interfaces/[`interface`] versus `type` in Flowtype it appears that the differences are not nearly as significant or different as in TypeScript, https://stackoverflow.com/questions/43023941/flow-interfaces-versus-types[link]. It seems they are or will become identical. I like this because of the simplicity factor. More power-to-weight ratio here than in TypeScript.
+
+**Sun Oct 1**
+
+* To upgrade `yarn` dependencies to latest simply run `yarn upgrade`. The lock file will be updated but the semver ranges in package.json will remain unchanged.
+
 **Tue Sep 19**
 
 * In Go command line flags are processed such that `-a=x` `--a=x` `-a x` `--a=x` all mean the same thing. The only exception is that booleans `true`/`false` cannot be used with the form `-a x` or `--a x`.
