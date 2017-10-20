@@ -1,0 +1,151 @@
+# Visiting Lambda Calculus
+
+Lambda Calculus is a model of computation. It was devised in the 1930s by Alonzo Church. Like Turing Machines it formalizes the concept of effective computability thereby determining which problems or classes of problems can be solved.
+
+## Breaking down the name
+
+"Lambda" is the 11th letter in the Greek alphabet and looks like: "λ" lowercase or "Λ" uppercase. It existed in ancient Greek times. It is somehow related to the Phoenician letter called Lamed. It influenced at least the Latin letter L and the Cyrillic letter El "л". Today its upper and lowercase forms are also used as a symbol for many different things, e.g. the radioactive decay constant in nuclear physics.
+
+"Calculus" is a method of calculation or reasoning.
+
+## Matter
+
+Lambda Calculus is made up of three basic terms. They are: `expressions`, `variables`, `abstractions`. These are collectively referred to as `lambda terms`.
+
+Variables are names for inputs. Inputs are what abstractions can be applied to (more detail soon). Variables have neither meaning nor value. An example of a variable is:
+
+```
+a
+```
+
+Abstractions have two parts: a head, a body. The head contains a variable name which in this position is referred to as a `parameter`. The body contains another expression. Abstractions have notation. The head is denoted with a lambda `λ`. The body is denoted with a period `.`. Putting all this together an example of an abstraction is:
+
+```
+λv.v
+```
+
+Abstractions can be applied to an input (more detail soon). Abstractions are so-named because their job is to generalize concrete instances of problems by using variables to make possible different inputs.
+
+
+If abstractions sound like functions its because they are.
+
+Expressions are a superset of lambda terms in that they can be variables, abstractions, or combinations thereof. Examples of expressions:
+
+```
+z
+```
+```
+(λo.o)
+```
+
+## Applying Matter
+
+### Beta Reduction
+
+The process of applying an abstraction is a sub-process of `beta reduction`. Two things happen to an abstraction when it is applied:
+
+. All parameter instances in the body are replaced with the input. This sub-process is referred to as `binding`. We say the abstraction's parameter is bound to the input.
+. The head is removed.
+
+Here is an example of executing this process:
+
+```
+step 1 ==> (λv.v)x
+step 2 ==> λx.v
+step 3 ==> λx.x
+step 4 ==> x
+```
+
+This is verbose, and so once understood ought be abbreviated to:
+
+```
+step 1 ==> (λv.v)x
+step 2 ==> x
+```
+
+Beta reduction is the repeated process of application until there are either no more abstractions or no more inputs. For example the following expressions are all beta reduced as far as they can be:
+
+```
+z
+```
+```
+λv.v
+```
+```
+λa.λn.n
+```
+```
+a(λn.n)
+```
+
+### Left Associative
+
+`Association` refers to how things are grouped. This concept must be addressed by beta reduction otherwise reducing multiple applications would be ambiguous. For example given the following expression:
+
+
+```
+(λa.a)(λn.n)(λo.o)
+```
+
+Is the correct reduction:
+
+```
+(λa.a)(λn.n)(λo.o)
+(λa.a)(λ(λo.o).n)
+(λa.a)(λ(λo.o).(λo.o))
+(λa.a)(λo.o)
+(λ(λo.o).a)
+(λ(λo.o).(λo.o))
+λo.o
+```
+
+or:
+
+```
+(λa.a)(λn.n)(λo.o)
+(λ(λn.n).a)(λo.o)
+(λ(λn.n).(λn.n))(λo.o)
+(λn.n)(λo.o)
+(λ(λo.o).n)
+(λ(λo.o).(λo.o))
+λo.o
+```
+
+Beta reduction is left associative so the latter is correct, but not the former. Left associativity means that the following are semantically identical:
+
+```
+((λa.a)(λn.n))(λo.o)
+```
+```
+(λa.a)(λn.n)(λo.o)
+```
+
+While the following are not _not_ semantically identical:
+
+```
+(λa.a)((λn.n)(λo.o))
+```
+```
+(λa.a)(λn.n)(λo.o)
+```
+
+## Free Variables
+
+It is possible that a variable in the body may not be bound by the head's parameter because they are simply different. Such body variables are called `free variables`. For example in the following `o` and `e` are both free variables:
+
+```
+λu.oe
+```
+
+When applying an abstraction with free variables the head is removed as normal but the free variables do not get replaced. Therefore the bound input is effectively discarded. For example in the following application `c` is discarded:
+
+```
+λx.i
+(λx.i)c
+λc.i
+i
+```
+
+## Alpha Equivalence
+
+TODO
