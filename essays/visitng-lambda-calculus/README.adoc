@@ -1,21 +1,25 @@
 # Visiting Lambda Calculus
 
-Lambda Calculus is a model of computation. It was devised in the 1930s by Alonzo Church. Like Turing Machines it formalizes the concept of effective computability thereby determining which problems or classes of problems can be solved.
-
-## Breaking down the name
-
-"Lambda" is the 11th letter in the Greek alphabet and looks like: "λ" lowercase or "Λ" uppercase. It existed in ancient Greek times. It is somehow related to the Phoenician letter called Lamed. It influenced at least the Latin letter L and the Cyrillic letter El "л". Today its upper and lowercase forms are also used as a symbol for many different things, e.g. the radioactive decay constant in nuclear physics.
-
-"Calculus" is a method of calculation or reasoning.
+Lambda Calculus is a model of computation. Like Turing Machines it formalizes the concept of effective computability thereby determining which problems or classes of problems can be solved. It was devised in the 1930s by Alonzo Church as part of his work into the foundations of mathematics.
 
 ## Matter
 
-Lambda Calculus is made up of three basic terms. They are: `expressions`, `variables`, `abstractions`. These are collectively referred to as `lambda terms`.
+Lambda Calculus consists of combining `lambda terms` and performing reducing operations upon them. There are three types of terms: `expressions`, `variables`, and `abstractions`.
 
-Variables are names for inputs. Inputs are what abstractions can be applied to (more detail soon). Variables have neither meaning nor value. An example of a variable is:
+Variables are names for logical values or parameters. As values they can be the input to an abstraction, the final result of reduction, or be in the body of an abstraction. They are more precisely known as `inputs` when used as inputs. Parameters exist in the head of abstractions. Variables have neither meaning nor value. Examples of variables are:
 
 ```
 a
+^
+var as value
+```
+```
+(λv.v)a
+  ^ ^ ^
+  | | |
+  | | | var as value, more specifically input
+  | | var as value
+  | var as parameter
 ```
 
 Abstractions have two parts: a head, a body. The head contains a variable name which in this position is referred to as a `parameter`. The body contains another expression. Abstractions have notation. The head is denoted with a lambda `λ`. The body is denoted with a period `.`. Putting all this together an example of an abstraction is:
@@ -82,7 +86,6 @@ a(λn.n)
 
 `Association` refers to how things are grouped. This concept must be addressed by beta reduction otherwise reducing multiple applications would be ambiguous. For example given the following expression:
 
-
 ```
 (λa.a)(λn.n)(λo.o)
 ```
@@ -111,33 +114,33 @@ or:
 λo.o
 ```
 
-Beta reduction is left associative so the latter is correct, but not the former. Left associativity means that the following are semantically identical:
+Beta reduction is `left associative` so the latter is correct, but not the former. Left associativity means that the following are semantically identical:
 
 ```
-((λa.a)(λn.n))(λo.o)
-```
-```
 (λa.a)(λn.n)(λo.o)
+```
+```
+((λa.a)(λn.n))(λo.o)
 ```
 
 While the following are not _not_ semantically identical:
 
 ```
-(λa.a)((λn.n)(λo.o))
-```
-```
 (λa.a)(λn.n)(λo.o)
+```
+```
+(λa.a)((λn.n)(λo.o))
 ```
 
 ## Free Variables
 
-It is possible that a variable in the body may not be bound by the head's parameter because they are simply different. Such body variables are called `free variables`. For example in the following `o` and `e` are both free variables:
+It is possible that a variable in the body may not be bound by the head's parameter because they are simply different. Such body variables are called `free variables`. For example in the following variables `o` and `e` are both free:
 
 ```
 λu.oe
 ```
 
-When applying an abstraction with free variables the head is removed as normal but the free variables do not get replaced. Therefore the bound input is effectively discarded. For example in the following application `c` is discarded:
+When applying an abstraction with free variables the head is eliminated as normal but said free variables do not get replaced. Therefore the bound input is effectively discarded when the head containing it is eliminated. For example in the following application variable `c` is discarded:
 
 ```
 λx.i
@@ -148,4 +151,28 @@ i
 
 ## Alpha Equivalence
 
-TODO
+What is the difference between the following:
+
+```
+λu.u
+```
+```
+λi.i
+```
+```
+λo.o
+```
+
+Think about the definition of Variables we read earlier:
+
+> Variables have neither meaning nor value
+
+...The answer is that there is no difference! The name of a variable does not affect its semantics. There is a name for this kind of equivalence: `alpha  equivalence`. Any time two expressions share the same structure they are alpha equivalent even if the name of their variables do not align.
+
+When there are free variables then alpha equivalence cannot be made even if the two expressions share structure. This is because the free variables could refer to anything, and consequently made not represent the same value afterall.
+
+## Appendix A: Breaking down the name
+
+"Lambda" is the 11th letter in the Greek alphabet and looks like: "λ" lowercase or "Λ" uppercase. It existed in ancient Greek times. It is somehow related to the Phoenician letter called Lamed. It influenced at least the Latin letter L and the Cyrillic letter El "л". Today its upper and lowercase forms are also used as a symbol for many different things, e.g. the radioactive decay constant in nuclear physics.
+
+"Calculus" is a method of calculation or reasoning.
