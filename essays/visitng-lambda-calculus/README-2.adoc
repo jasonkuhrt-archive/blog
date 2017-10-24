@@ -1,0 +1,34 @@
+
+
+# A layman's foray into Lambda Calculus
+
+## introduction
+* i am trying to better grasp functional programming
+* lambda calculus is the foundation of functional programming
+* taking some time to understand this layer made sense to me
+* i am also generally curious about elegant systems meaning those with properties like clear delineations, internal and external consistency, simplicity, minimal cognitive overhead, and so on
+* i have a practical interest in improving my day to day work like what systems i choose to leverage or how i design my own systems
+* i also however experience great joy when simulating beautiful systems in my mind not unlike what one may experience upon looking at a painting or listening to a musical composition.
+
+## what is lambda calculus
+* it was developed in the 1930s over several iterations chiefly by mathematician Alonzo Church
+* a formal system in mathematical logic for expressing computation based on function abstraction and function application using variable binding and variable substitution
+* a set of operations can be iteratively applied on an expression thereby successively reducing it.
+* if the expression is non-terminating then this process will iterate forever
+* otherwise the repeated reducing steps will eventually culminate to an expression that cannot be further reduced
+
+## Why lambda calculus
+
+## What does lambda calculus look like
+* there are three lambda terms: variables, abstractions, expressions
+* variables are names which refer an unknown expression
+* abstractions are single-parameter functions
+* expressions are combinations of and/or variables and abstractions
+* abstractions have a head and body. The head has one parameter which is a variable. The body is an expression.
+
+## References
+
+* http://haskellbook.com
+* https://stackoverflow.com/questions/11239262/what-is-meant-by-capture-avoiding-substitutions
+* https://en.wikipedia.org/wiki/Lambda_calculus
+* https://plato.stanford.edu/entries/lambda-calculus/

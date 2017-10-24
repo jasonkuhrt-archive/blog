@@ -4,34 +4,48 @@ Lambda Calculus is a model of computation. Like Turing Machines it formalizes th
 
 ## Matter
 
-Lambda Calculus consists of combining `lambda terms` and performing reducing operations upon them. There are three types of terms: `expressions`, `variables`, and `abstractions`.
+The following three rules can unambiguously specify the syntax rules of lambda calculus:
 
-Variables are names for logical values or parameters. As values they can be the input to an abstraction, the final result of reduction, or be in the body of an abstraction. They are more precisely known as `inputs` when used as inputs. Parameters exist in the head of abstractions. Variables have neither meaning nor value. Examples of variables are:
+. A variable e.g. `x` is a valid lambda-term (`variable`)
+. Given a variable e.g. `v` and another valid lambda-term e.g. `o` then e.g. `(λv.o)` is a valid lambda-term (`abstraction`)
+. Given two lambda-terms e.g. `i` and `o` then `io` is a valid lambda-term (`application`)
+
+But this doesn't help understand what parts are what. Lambda calculus consists of combining `lambda terms` and performing reducing operations upon them. There are three types of terms: `expressions`, `variables`, and `abstractions`.
+
+### Variables
+
+Variables on their own they have neither meaning nor value. They are names for both logical values and parameters. Examples of variables are:
 
 ```
 a
 ^
-var as value
+var as a value
 ```
 ```
 (λv.v)a
   ^ ^ ^
   | | |
-  | | | var as value, more specifically input
-  | | var as value
-  | var as parameter
+  | | | var as an input (a kind of value)
+  | | var as a value
+  | var as a parameter
 ```
 
-Abstractions have two parts: a head, a body. The head contains a variable name which in this position is referred to as a `parameter`. The body contains another expression. Abstractions have notation. The head is denoted with a lambda `λ`. The body is denoted with a period `.`. Putting all this together an example of an abstraction is:
+### Abstractions
+
+Abstractions are anonymous functions that take a single input. They syntactically have two parts: a head denoted with a lambda `λ` and a body denoted with a period `.`. The head contains a variable which in this position is referred to as a `parameter`. The body contains an expression.
 
 ```
-λv.v
+(λv .v)
+ ^^ ^^
+ |/ |/
+ |  | body
+ |
+ | head
 ```
 
-Abstractions can be applied to an input (more detail soon). Abstractions are so-named because their job is to generalize concrete instances of problems by using variables to make possible different inputs.
+Abstractions can be applied to an expression (more detail soon). Abstractions are so-named because their job is to generalize concrete instances of problems by using variables to make possible different inputs.
 
-
-If abstractions sound like functions its because they are.
+### Expressions
 
 Expressions are a superset of lambda terms in that they can be variables, abstractions, or combinations thereof. Examples of expressions:
 
@@ -41,12 +55,17 @@ z
 ```
 (λo.o)
 ```
+```
+(λo.(λi.i)x)
+```
 
-## Applying Matter
+## Reducing Matter
 
-### Beta Reduction
+There are two reduction operations: beta-reduction and alpha-conversion. We recurse these operations on an expression until eventual termination or we've reached an infinite loop. If termination is reached we say the remaining expression has reached its `beta-normal-form`.
 
-The process of applying an abstraction is a sub-process of `beta reduction`. Two things happen to an abstraction when it is applied:
+### β-Reduction
+
+The process of applying an abstraction is `beta reduction`. Two things happen to an abstraction when it is applied:
 
 . All parameter instances in the body are replaced with the input. This sub-process is referred to as `binding`. We say the abstraction's parameter is bound to the input.
 . The head is removed.
@@ -134,18 +153,30 @@ While the following are not _not_ semantically identical:
 
 ## Free Variables
 
-It is possible that a variable in the body may not be bound by the head's parameter because they are simply different. Such body variables are called `free variables`. For example in the following variables `o` and `e` are both free:
+Free variables are variables that are not bound by an abstraction. This means a variable within the abstraction whose name is not found in the head of the abstraction or any ancestor abstraction enclosing this one. For example in the following variables `o` and `e` are both free:
 
 ```
-λu.oe
+(λu.oe)
 ```
 
-When applying an abstraction with free variables the head is eliminated as normal but said free variables do not get replaced. Therefore the bound input is effectively discarded when the head containing it is eliminated. For example in the following application variable `c` is discarded:
+As they are here too:
 
 ```
-λx.i
+(λi.(λu.oe))
+```
+
+However here they are bound by the grandparent and great-grandparent abstractions:
+
+```
+(λo.(λe.(λi.(λu.oe))))
+```
+
+When applying an abstraction with free variables the head is eliminated as normal but said free variables do not get replaced. Therefore the input is effectively discarded. For example in the following application variable `c` is discarded:
+
+```
+(λx.i)
 (λx.i)c
-λc.i
+(λ[x:=c].i)
 i
 ```
 
@@ -154,25 +185,84 @@ i
 What is the difference between the following:
 
 ```
-λu.u
+(λu.u)
 ```
 ```
-λi.i
+(λi.i)
 ```
 ```
-λo.o
+(λo.o)
 ```
 
-Think about the definition of Variables we read earlier:
+The answer is that there is no difference because parameter names do not affect semantics. This kind of equivalence is called `alpha  equivalence`.
 
-> Variables have neither meaning nor value
+However when a body contains free variables then alpha equivalence is not possible. This makes sense because the free variables could potential refer to different expressions.
 
-...The answer is that there is no difference! The name of a variable does not affect its semantics. There is a name for this kind of equivalence: `alpha  equivalence`. Any time two expressions share the same structure they are alpha equivalent even if the name of their variables do not align.
 
-When there are free variables then alpha equivalence cannot be made even if the two expressions share structure. This is because the free variables could refer to anything, and consequently made not represent the same value afterall.
+## Capture-Avoiding Substitutions
+
+When doing substitutions it may seem that the variable names in the substitution do not matter but as we have seen with with alpha equivalence we must take care with free variables. Specifically when substituting we must be careful not to accidently transform fre variables into bound ones.
+
+Consider this expression:
+
+```
+((λa.(λe.a))(λo.e))i
+```
+
+And see if you can spot the bug in the following reduction of it:
+
+```
+((λe.(λo.e))o)i
+(λe[e:=o].(λo.e))i
+(λo.o)i
+i
+```
+
+What has gone wrong here? ...The constant function `(λo.e)` morphed into the identity function `(λo.o)`! Here's a version with the bug fixed:
+
+```
+((λe.(λo.e))o)i
+(λe[e:=z].(λo.e))i
+(λo.z)i
+z
+```
+
+Any time substituting an expression would lead to a free variable being captured we must rename the free variable. That can mean renaming a standalone variable or a variable inside an abstraction
+
+A case with free variable being within an abstraction as input:
+
+Wrong:
+```
+(λo.(λe.o))(λu.e)i
+(λo[o=(λu.e)].(λe.o))i
+(λe.(λu.e))i
+        ^ Bug, this was free, is now bound
+(λe[e:=i].(λu.e))
+       ^ This i should have become discarded
+(λu.i)
+    ^ But nope
+```
+
+Correct:
+
+```
+(λo.(λe.o))(λu.e)i
+(λo[o=(λu.z)].(λe.o))i
+          ^ Rename...
+(λe.(λu.z))i
+        ^ ...to stay free
+(λe[e:=i].(λu.z))
+       ^ Unlike before this i is correctly discarded
+(λu.z)
+```
 
 ## Appendix A: Breaking down the name
 
 "Lambda" is the 11th letter in the Greek alphabet and looks like: "λ" lowercase or "Λ" uppercase. It existed in ancient Greek times. It is somehow related to the Phoenician letter called Lamed. It influenced at least the Latin letter L and the Cyrillic letter El "л". Today its upper and lowercase forms are also used as a symbol for many different things, e.g. the radioactive decay constant in nuclear physics.
 
 "Calculus" is a method of calculation or reasoning.
+
+## References
+
+* https://stackoverflow.com/questions/11239262/what-is-meant-by-capture-avoiding-substitutions
+* https://en.wikipedia.org/wiki/Lambda_calculus
