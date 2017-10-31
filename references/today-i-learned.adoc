@@ -9,6 +9,14 @@ At the risk of stating the obvious this format is nothing new. Surely most think
 
 ## Entries
 
+**Sat Oct 28**
+
+* Occam's Razor is a principal that when problem solving no more assumptions should be made than necessary. It states that given a set of hypotheses the one which makes the fewest assumptions should be selected. In practice, in science, it is used as a heuristic guide in the development of theoretical models, rather than a rigorous rule forcing selection between models.
+
+**Thur Oct 26**
+
+* Defining the terms of lambda calculus is highly inconsistent in the material I have been reading. In http://haskellbook.com/[Haskell book] the basic lambda terms are: expressions, abstractions, variables. In https://plato.stanford.edu/entries/lambda-calculus/[this article] and https://en.wikipedia.org/wiki/Lambda_calculus[wikipedia] they are: variables, abstractions, applications. In http://www.inf.fu-berlin.de/lehre/WS03/alpi/lambda.pdf[this article] they are: expressions, abstractions, applications.
+
 **Sat Oct 7**
 
 * In TypeScript using an interface versus using a type alias changes how the type is represented in IDE type tooltips. With interfaces, tooltips will show the name of the interface. For example `interface Foo {}` will show as `Foo`. However with type aliases the tooltips will contain the contents of the alias. For example `type Foo = { a: string }` will show as `{ a: string }`. I prefer the way interfaces are presented because its much more readable than having the guts of many fields splayed into a tooltip. More details can be found in https://stackoverflow.com/questions/37233735/typescript-interfaces-vs-types[this SO thread]. Noted in this thread are two additional benefits of interfaces in TypeScript:

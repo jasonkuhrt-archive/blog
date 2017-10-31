@@ -3,32 +3,141 @@
 # A layman's foray into Lambda Calculus
 
 ## introduction
-* i am trying to better grasp functional programming
-* lambda calculus is the foundation of functional programming
-* taking some time to understand this layer made sense to me
-* i am also generally curious about elegant systems meaning those with properties like clear delineations, internal and external consistency, simplicity, minimal cognitive overhead, and so on
-* i have a practical interest in improving my day to day work like what systems i choose to leverage or how i design my own systems
-* i also however experience great joy when simulating beautiful systems in my mind not unlike what one may experience upon looking at a painting or listening to a musical composition.
 
-## what is lambda calculus
-* it was developed in the 1930s over several iterations chiefly by mathematician Alonzo Church
-* a formal system in mathematical logic for expressing computation based on function abstraction and function application using variable binding and variable substitution
-* a set of operations can be iteratively applied on an expression thereby successively reducing it.
-* if the expression is non-terminating then this process will iterate forever
-* otherwise the repeated reducing steps will eventually culminate to an expression that cannot be further reduced
+I am interested in functional programming because of what appears to me to be its relatively strong theoretical foundations. Over the past few years I have sporadically followed and studied its ideas. The basis of functional programming languages, specifically pure ones, is a formal method from mathematics called lambda calculus. This came to my attention most forcefully after reading the opening chapter in the Haskell book. Looking back, it makes perfect sense that a strong grasp of the craft of functional programming could start with gaining an appreciation for its basis.
 
-## Why lambda calculus
+But if we mute functional programming motivations for a moment, lambda calculus still appears in its own right to be something worthy of familiarization for anyone simply interested in elegant systems. Maybe it can serve as inspiration for you to produce better designs in other areas. Maybe beauty is all you need and so in simulating lambda calculus in your head shall you be moved not unlike looking at a masterful painting or listening to a musical composition. Clear delineations, consistency, simplicity, emergent power through composition of a small set of primitives, etc. While the mathematics involved may eventually pose an upper practical bound on your available time, there is still an appreciable low hanging fruit to be had. When a further and deeper return should make sense, it shall be waiting for you, as it has since 1934.
 
-## What does lambda calculus look like
-* there are three lambda terms: variables, abstractions, expressions
-* variables are names which refer an unknown expression
-* abstractions are single-parameter functions
-* expressions are combinations of and/or variables and abstractions
-* abstractions have a head and body. The head has one parameter which is a variable. The body is an expression.
+## High Level
+
+This essay will unpack how Lambda Calculus is a formal system in mathematical logic for expressing computation based on function abstraction and function application using variable binding and variable substitution. But first a bit of history. It was developed in the 1930s over several iterations chiefly by mathematician Alonzo Church. His goal was to formalize the concept of effective computability, hence the name wherein calculus itself means a method of reasoning.
+
+## Matter
+## The Iterative Process
+
+The physical world of lambda calculus is composed by what are known as lambda terms. There are only a handful of them. Accompanying these terms are fewer still operations which enable the systematic evaluation of these terms. When an operation is evaluated on a term, a new term is produced. This process repeats itself: a produced term is evaluated producing yet another term, it is evaluated again, and so on. The process either iterates forever because there is some kind of infinite cycle or comes to an end because an irreducible term has been reached.
+
+## The Terms & Their Syntax
+
+There are three lambda terms: variables, abstractions, applications. A superset of all of these are expressions which can take the form of any term or combinations thereof.
+
+Variables are the simplest. They are just a named reference, a placeholder. The name of a variable does not have any inherent significance. It is only important as a referencing system which we will get to in a moment.
+
+Abstractions are functions and we shall use these terms interchangeably. They have two parts, a head and a body. The head is used to contain exactly one parameter. The body is used to encapsulate an expression. The body expression may contain variables that are the same name as the head's parameter. This is significant. Name matches create a relationship which is that when a function is applied the argument (the expression the function is applied to) replaces all variables referencing the parameter. Variables are said to be bound when they refer to a parameter. Variables that do not refer to a parameter are said to be free. With this terminology in place, we may say that bound variables are substituted for the argument during function application. We will explore this operation formally soon.
+
+Applications are what they sound like, a function applied to an argument. The argument is just an expression but its special context garners it a special name. Since the argument is an expression that means it may be a variable or another function.
+
+## The operations
+There are two operations, beta-reduction, alpha...TODO
+
+
+### Beta-reduction
+
+Beta-reduction is the process of applying an abstraction to a variable. The variable in this context is called an argument. All variables in the function body which are bound to the function parameter are replaced with the argument. This is called variable substitution. Finally the head itself is simply discarded. The function that was ceases to be, its now transformed body is what remains.
+
+### Name Collision: Interaction Between Alpha-Equivalence & Variable Substitution
+
+Alpha equivalence refers to the fact that variables have no meaning and therefore and for example multiple identity functions with differently named parameters are semantically equivalent.
+
+When performing variable substitution it is possible that free variables in the argument would become bound variables after substitution. Allowing this however would be incorrect, as free and bound variables are clearly distinct from one another. Consider the following which demonstrates the flaw:
+
+(λi.(λu.iu))u
+λ[i:=u].(λu.iu)
+λu.uu
+
+This is the incorrect answer. To solve this we can either rename the colliding parameter or we can rename those free variables contained in the argument which collide. The result is the same: avoid collision.
+
+Approach 1: Renaming the parameter:
+
+```
+(λi.(λu.iu))u
+λ[i:=u].(λu.iu)
+          |  |
+λ[i:=u].(λx.ix)
+λx.ux
+```
+
+Approach 2: Renaming free variables in the argument:
+
+```
+(λi.(λu.iu))u
+λ[i:=u].(λu.iu)
+     |
+λ[i:=x].(λu.iu)
+λu.xu
+```
+
+If we compare these two results we see that they are alpha-equivalent. Therefore we can say that either approach works.
+
+The approaches work the same given multiple renames being required.
+
+Example of approach 1 with multiple parameter renames:
+
+```
+(λo.(λa.(λc.o)))(λh.ac)
+(λ[o:=(λh.ac)].(λa.(λc.o)))
+                 |   |
+(λ[o:=(λh.ac)].(λz.(λx.o)))
+(λz.(λx.(λh.ac)))
+```
+
+Example of approach 2 with multiple free variable renames:
+
+```
+(λo.(λa.(λc.o)))(λh.ac)
+(λ[o:=(λh.ac)].(λa.(λc.o)))
+          ||
+(λ[o:=(λh.zx)].(λa.(λc.o)))
+(λa.(λc.(λh.zx)))
+```
+
+## Combinators
+
+Abstractions that do not have any free variables are a special kind of abstraction called a combinator. Combinators are so-called because they serve to combine their arguments.
+
+## Currying
+
+Currying, when thought of outside the context of lambda calculus can be described as a kind of multi-parameter function application technique. Arguments are fed one at time, returning a new function less a parameter each time, until all parameters are exhausted and the function is actually executed. But within lambda calculus we see this is actually the only way it could be, given that functions are limited to a single parameter. The beauty of the lambda calculus approach is that it doesn't create a new concept to deal with multi-parameter functions, it just logically derives the capability from its minimal set of building blocks. Further, this derivation is actually superior to non-curried functions because curried function allow effortless on-the-fly specialization of functions, reducing the need to always be creating new functions. For example TODO
+
+## Other topics
+### General
+* based on what we know about lambda calculus we can say such languages are centred on evaluating expressions rather than executing instructions as would be the case for a procedural language like Go
+### sub-types of lambda calculus
+* there are different kinds of lambda calculus including typed and untyped
+* typed lambda calculus can express less than untyped lambda calculus but it provides guarantees like TODO
+* work has been done over time trying to be able to represent more expressions from the untyped version in the typed version.
+### Haskell
+* haskell is a typed lambda calculus
+* pure functional programming languages, like haskell, are based on lambda calculus, therefore sharing its semantics
+* unlike lambda calculus haskell is evaluated by call-by-need
+### Forms
+* normal order is a common evaluation strategy in lambda calculi
+* there are multiple normal forms
+* beta normal form is when you cannot beta reduce anymore
+### Reduction
+* abstractions that cannot reach beta normal form are said to diverge
+* this is akin to an infinite loop in a program
+* left associative, therefore we sometimes can omit parentheses
+### Substitution
+* avoid confusing names, e.g. in (Lx.x)(Ly.yx) the `x` in the second abstraction is totally unrelated to the `x` in the first
+* when performing substitutions be careful to not mix free variables with bound ones, e.g. (Lz.(Lx.zx))x
+### Other
+* application is left associative while abstraction is right associative
+* given a basic grasp of lambda calculus basics (its terms, operations), it is possible to use it to represent things like: numbers, logic, recursion, all computable functions
+* One interesting bit is that present day computers in widespread use are von neumann computers, conceptually like turning machines with random registry access; imperative languages are based on how a turing machine is instructed, by a sequence of statements. functional languages are based on lambda calculus. So what would a machine designed for these kinds of programs be? A reduction machine. Since those are not in widespread use clever compilers figure out how to transform our pure functional programmings into imperative machine instructions
+
+
 
 ## References
 
 * http://haskellbook.com
+
+Haskell Book references
+
+* http://www.inf.fu-berlin.de/lehre/WS03/alpi/lambda.pdf
+* http://www.cse.chalmers.se/research/group/logic/TypesSS05/Extra/geuvers.pdf
+* http://www.paultaylor.eu/stable/prot.pdf
+
 * https://stackoverflow.com/questions/11239262/what-is-meant-by-capture-avoiding-substitutions
 * https://en.wikipedia.org/wiki/Lambda_calculus
 * https://plato.stanford.edu/entries/lambda-calculus/
