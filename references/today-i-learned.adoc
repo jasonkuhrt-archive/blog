@@ -9,6 +9,12 @@ At the risk of stating the obvious this format is nothing new. Surely most think
 
 ## Entries
 
+**Wed Nov 15**
+
+* Have been playing with Most.js again recently. A new engine published as http://mostcore.readthedocs.io/en/latest/[`@most/core`] recently hit 1.0 and will be the basis for `most@2.0`.
+
+* Most is a functional reactive programming library with a few concepts: events, event streams, sinks, schedulers. Events are conceptually tuples of time and value. Event streams are time ordered sequences of events. Sinks are internal to the implementation of a stream and are where events go into in order for a type of stream to get at and process the event. A stream is a chain of different operations each with a sink. When the whole stream is run the run command works up the chain to the source, the source begins producing events which it feeds to the sink of the next operator which in turn the next operator does as well and so on such that there is an internal chain of sinks. Schedulers provide time facilities so that a custom scheduler can alter the entire timing of the stream. Some additional concepts supporting schedulers include Timer Timeline Clock Task and ScheduledTask.
+
 **Sat Oct 28**
 
 * Occam's Razor is a principal that when problem solving no more assumptions should be made than necessary. It states that given a set of hypotheses the one which makes the fewest assumptions should be selected. In practice, in science, it is used as a heuristic guide in the development of theoretical models, rather than a rigorous rule forcing selection between models.
