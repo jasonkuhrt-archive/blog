@@ -1,0 +1,142 @@
+:toc: macro
+:toc-title:
+:sectanchors:
+:toclevels: 99
+
+# Hello GraphQL
+
+2017 November 8
+
+## Hello World
+
+* GraphQL is a technology originally developed at Facebook in 2012
+* It was open-sourced in 2015
+* Many companies have adopted it for internal APIs (https://open.nytimes.com/react-relay-and-graphql-under-the-hood-of-the-times-website-redesign-22fb62ea9764[New York Times], https://www.youtube.com/watch?v=T3FbZsYXi50[IBM], https://dev-blog.apollodata.com/courseras-journey-to-graphql-a5ad3b77f39a[Coursera], ...), but some companies have also launched public API (https://www.youtube.com/watch?v=Baw05hrOUNM[Twitter], https://developer.github.com/v4/[Github], https://www.yelp.com/developers/graphql/guides/intro[Yelp], ...).
+
+## A Specification
+
+* GraphQL is a specification that chiefly defines a type system and a query language
+
+### Not everything is specified
+
+* Many aspects of GraphQL that will need to be solved in production are intentionally left unspecified such as what transport to use, how authorization should work, or how error handling should work
+* This is a tradeoff. A key advantage is that the community can explore unspecified spaces to discovered optimal designs. But now efforts will be fragmented leading to a host of negatives.
+* But arguably the wrong standard is worse than no standard and so for example it seems reasonable that if authorization architecture looks very different from one company to the next it should not be standardized.
+* And we hope that if over time if a clear design principal emerges from the community it will be folded back into the core spec
+* Or maybe it can be specified in a spec extension like Facebook's https://facebook.github.io/relay/graphql/connections.htm[Relay Cursor Connections Specification]
+
+### Making a query
+
+```
+fragment RelatedProduct on Product {
+  id,
+  name,
+  price: {
+    amount(formatted: true)
+  },
+  primary_image(height: 50): {
+    width,
+    height,
+    alt_text
+  }
+}
+```
+```
+fragment AllMeasurements on ProductMeasurements {
+  ... on Shirt {
+    shoulders,
+    chest,
+    length,
+    sleeve,
+  }
+}
+```
+```
+query product(id: $product_id, language: $language, region: $region) {
+  sku,
+  name,
+  summary,
+  description,
+  material_facts,
+  in_my_wishlist,
+  model: {
+    description,
+    size: {
+      chest,
+      hip,
+      shoulder,
+      waist,
+    }
+  },
+  price {
+    amount
+    amount_formatted: amount(formatted: true),
+    currency_name
+  },
+  styled_with: {
+    ...RelatedProduct
+  },
+  images(width: 400): {
+    width,
+    height,
+    alt_text
+  },
+  sizes: {
+    id,
+    name
+    measurements: {
+      ...AllMeasurements
+    },
+    stock,
+  },
+  category: {
+    product_sizing_diagram,
+    id,
+    name
+    products (limit: 7): {
+      ...RelatedProduct
+    }
+  },
+  brand: {
+    id,
+    name
+    products(limit: 5, like_product: $product_id): {
+      ...RelatedProduct
+    }
+  }
+}
+```
+
+### Type System
+
+TODO
+
+### Query Language
+
+TODO
+
+## Novelty
+
+* Some of the things that make GraphQL notable are:
+
+** its conservative iterative and organic development over years of production experience
+** originated as a data solution for mobile apps, still driven by needs of frontend engineers
+** particularly strong ecosystem support for React
+** its rich type system including union types and opt-in null-free
+** its opt-in field-level granularity query model
+** its fields-are-functions query model
+** its ecosystem of tooling
+** its fundamental flexibility, such as not even requiring HTTP
+** its interface unification of streaming and request-response
+
+Some other technologies have overlapping benefits like https://grpc.io[gRPC]  (strong types, unified streaming/request-response interface) or http://netflix.github.io/falcor/[Falcor] (graph queries, data layer abstraction), but GraphQL is ultimately highly unique in its intersection of characteristics.
+
+## An Ecosystem
+
+TODO
+
+References
+
+* https://www.howtographql.com/
+* https://github.com/chentsulin/awesome-graphql
+* https://twitter.com/tomdale/status/786951612053020672?lang=en
