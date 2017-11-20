@@ -24,6 +24,31 @@ query Product(id: "ab781du3", language: EN) {
 }
 ```
 
+## A mental model
+
+### Queries
+
+. client makes a request
+. request gets validated
+. requested fields get resolved into data
+. response is sent back
+
+### Mutations
+
+. client makes a request
+. request gets validated
+. mutation is carried out
+. requested response fields are resolved into data
+. response is sent back
+
+### Subscriptions
+
+. client makes a request
+. request gets validated
+. new subscriber for event source is registered
+. each event from source is executed against with originally given query
+. ...then the resolved data is sent back
+
 ## A Specification
 
 GraphQL is a specification that chiefly defines a type system and a query language
