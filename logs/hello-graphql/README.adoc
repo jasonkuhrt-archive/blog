@@ -9,21 +9,32 @@
 
 ## Hello World
 
-* GraphQL is a technology originally developed at Facebook in 2012
-* It was open-sourced in 2015
-* Many companies have adopted it for internal APIs (https://open.nytimes.com/react-relay-and-graphql-under-the-hood-of-the-times-website-redesign-22fb62ea9764[New York Times], https://www.youtube.com/watch?v=T3FbZsYXi50[IBM], https://dev-blog.apollodata.com/courseras-journey-to-graphql-a5ad3b77f39a[Coursera], ...), but some companies have also launched public API (https://www.youtube.com/watch?v=Baw05hrOUNM[Twitter], https://developer.github.com/v4/[Github], https://www.yelp.com/developers/graphql/guides/intro[Yelp], ...).
+GraphQL is a technology that enables clients to fetch just the data they need from backends in a predictable and safe way. Predictable because the query shape is the data shape, safe because queries operate on strongly typed data. At its core GraphQL is just a specification. The surrounding community extends it, builds tools around it, and helps evolve it. It was originally developed at Facebook in 2012 but later open-sourced in 2015. Over the following two years many companies adopted it for internal APIs (https://open.nytimes.com/react-relay-and-graphql-under-the-hood-of-the-times-website-redesign-22fb62ea9764[New York Times], https://www.youtube.com/watch?v=T3FbZsYXi50[IBM], https://dev-blog.apollodata.com/courseras-journey-to-graphql-a5ad3b77f39a[Coursera], ...), but some companies also launched public APIs (https://www.youtube.com/watch?v=Baw05hrOUNM[Twitter], https://developer.github.com/v4/[Github], https://www.yelp.com/developers/graphql/guides/intro[Yelp], ...).
+
+Here is an example of a GraphQL query:
+
+```graphql
+query Product(id: "ab781du3", language: EN) {
+  name,
+  description,
+  sizes: {
+    name,
+    stock,
+  }
+}
+```
 
 ## A Specification
 
-* GraphQL is a specification that chiefly defines a type system and a query language
+GraphQL is a specification that chiefly defines a type system and a query language
 
 ### Not everything is specified
 
-* Many aspects of GraphQL that will need to be solved in production are intentionally left unspecified such as what transport to use, how authorization should work, or how error handling should work
-* This is a tradeoff. A key advantage is that the community can explore unspecified spaces to discovered optimal designs. But now efforts will be fragmented leading to a host of negatives.
-* But arguably the wrong standard is worse than no standard and so for example it seems reasonable that if authorization architecture looks very different from one company to the next it should not be standardized.
-* And we hope that if over time if a clear design principal emerges from the community it will be folded back into the core spec
-* Or maybe it can be specified in a spec extension like Facebook's https://facebook.github.io/relay/graphql/connections.htm[Relay Cursor Connections Specification]
+Many aspects of GraphQL that will need to be solved in production are intentionally left unspecified. Some notable omissions include what transport to use (HTTP is not mentioned anywhere for example), how authorization should work, how error handling should work. This is a tradeoff. A key advantage is that the community can explore unspecified spaces to discover new solutions that offer optimal tradeoffs. But now efforts will be fragmented leading to a host of negatives like more decisions to make as a user and less mature libraries, tooling, etc. But arguably the wrong standard is worse than no standard and so for example it seems reasonable that if authorization architecture looks very different from one company to the next it should not be standardized. And certainly one may hope that if over time if a clearly superior design pattern emerges from the community it will be folded back into the core spec somehow, or failing that perhaps instead specified as an extension like Facebook's https://facebook.github.io/relay/graphql/connections.htm[Relay Cursor Connections Specification].
+
+## Case Study
+
+TODO
 
 ### Making a query
 
@@ -135,8 +146,16 @@ Some other technologies have overlapping benefits like https://grpc.io[gRPC]  (s
 
 TODO
 
-References
+## Summary
 
+* GraphQL is a **specification** with _many implementations_
+* GraphQL was originally created at Facebook but is now developed in the open by many companies and engineers.
+* https://www.apollodata.com/[Apollo] is the/one of the most directly involved/invested companies in furthering the technology (not consumer but driver) outside of Facebook. Apollo is part of https://www.meteor.com[Meteor].
+
+## References
+
+* http://graphql.org/learn[official docs]
+* http://facebook.github.io/graphql[spec]
 * https://www.howtographql.com/
-* https://github.com/chentsulin/awesome-graphql
+* https://github.com/chentsulin/awesome-graphql[awesome-graphql]
 * https://twitter.com/tomdale/status/786951612053020672?lang=en
