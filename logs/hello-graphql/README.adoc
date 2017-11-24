@@ -5,11 +5,13 @@
 
 # Hello GraphQL
 
+toc::[]
+
 2017 November 8
 
 ## Hello World
 
-GraphQL is a technology that enables clients to fetch just the data they need from backends in a predictable and safe way. Predictable because the query shape is the data shape, safe because queries operate on strongly typed data. At its core GraphQL is just a specification. The surrounding community extends it, builds tools around it, and helps evolve it. It was originally developed at Facebook in 2012 but later open-sourced in 2015. Over the following two years many companies adopted it for internal APIs (https://open.nytimes.com/react-relay-and-graphql-under-the-hood-of-the-times-website-redesign-22fb62ea9764[New York Times], https://www.youtube.com/watch?v=T3FbZsYXi50[IBM], https://dev-blog.apollodata.com/courseras-journey-to-graphql-a5ad3b77f39a[Coursera], ...), but some companies also launched public APIs (https://www.youtube.com/watch?v=Baw05hrOUNM[Twitter], https://developer.github.com/v4/[Github], https://www.yelp.com/developers/graphql/guides/intro[Yelp], ...).
+GraphQL is a technology that enables clients to fetch just the data they need from backends in a predictable and safe way. Predictable because the query shape is the data shape, safe because queries operate on strongly typed data. At its core GraphQL is just a http://facebook.github.io/graphql[specification]. The surrounding community extends it, builds tools around it, and helps evolve it. It was originally developed at Facebook in 2012 but later open-sourced in 2015. Over the following two years many companies adopted it for internal APIs (https://open.nytimes.com/react-relay-and-graphql-under-the-hood-of-the-times-website-redesign-22fb62ea9764[New York Times], https://www.youtube.com/watch?v=T3FbZsYXi50[IBM], https://dev-blog.apollodata.com/courseras-journey-to-graphql-a5ad3b77f39a[Coursera], ...), but some companies also launched public APIs (https://www.youtube.com/watch?v=Baw05hrOUNM[Twitter], https://developer.github.com/v4/[Github], https://www.yelp.com/developers/graphql/guides/intro[Yelp], ...).
 
 Here is an example of a GraphQL query:
 
@@ -29,14 +31,16 @@ query Product(id: "ab781du3", language: EN) {
 ### Queries
 
 . client makes a request
-. request gets validated
+. request gets syntactically validated
+. request gets validated against schema
 . requested fields get resolved into data
 . response is sent back
 
 ### Mutations
 
 . client makes a request
-. request gets validated
+. request gets syntactically validated
+. request gets validated against schema
 . mutation is carried out
 . requested response fields are resolved into data
 . response is sent back
@@ -44,18 +48,47 @@ query Product(id: "ab781du3", language: EN) {
 ### Subscriptions
 
 . client makes a request
-. request gets validated
+. request gets syntactically validated
+. request gets validated against schema
 . new subscriber for event source is registered
 . each event from source is executed against with originally given query
 . ...then the resolved data is sent back
 
 ## A Specification
 
-GraphQL is a specification that chiefly defines a type system and a query language
+GraphQL is a specification that chiefly defines a type system and a query language.
 
 ### Not everything is specified
 
-Many aspects of GraphQL that will need to be solved in production are intentionally left unspecified. Some notable omissions include what transport to use (HTTP is not mentioned anywhere for example), how authorization should work, how error handling should work. This is a tradeoff. A key advantage is that the community can explore unspecified spaces to discover new solutions that offer optimal tradeoffs. But now efforts will be fragmented leading to a host of negatives like more decisions to make as a user and less mature libraries, tooling, etc. But arguably the wrong standard is worse than no standard and so for example it seems reasonable that if authorization architecture looks very different from one company to the next it should not be standardized. And certainly one may hope that if over time if a clearly superior design pattern emerges from the community it will be folded back into the core spec somehow, or failing that perhaps instead specified as an extension like Facebook's https://facebook.github.io/relay/graphql/connections.htm[Relay Cursor Connections Specification].
+Many aspects of GraphQL that will need to be solved in production are intentionally left unspecified. Some notable omissions include what transport to use (HTTP is not mentioned anywhere for example), how authorization should work, how error handling should work. This is a tradeoff. A key advantage is that the community can explore unspecified spaces to discover new solutions that offer optimal tradeoffs. But now efforts will be fragmented leading to a host of negatives like more decisions to make in userland and less mature libraries, tooling, etc. But arguably the wrong standard is worse than no standard and so for example it seems reasonable that if authorization architecture looks very different from one company to the next it should not be standardized. And certainly one may hope that if over time if a clearly superior design pattern emerges from the community it will be folded back into the core spec somehow, or failing that perhaps instead specified as an extension like Facebook's https://facebook.github.io/relay/graphql/connections.htm[Relay Cursor Connections Specification].
+
+## Anatomy of GraphQL Schema
+
+### String
+### Float
+### Int
+### Enum
+### Union
+### Interface
+### Object
+### Input Object
+### List a
+### Maybe a
+### Directives
+
+## Anatomy of GraphQL Queries
+
+Hopefully you now have a sense of what GraphQL is. Lets survey some of its main features so that you have a deeper understanding of what it can and cannot do in more precise operational terms.
+
+### Document
+### Selection Set
+### Operation (query, mutation, subscription)
+### Aliases
+### Functions
+### Opt-in
+### Directives
+### Fragments
+### Variables
 
 ## Case Study
 
@@ -143,13 +176,15 @@ query product(id: $product_id, language: $language, region: $region) {
 }
 ```
 
-### Type System
+## Ecosystem
 
-TODO
-
-### Query Language
-
-TODO
+* queries are typed out literally in code, as-you-type validation
+* GraphiQL, Voyager, Graphcool, Graphene, Relay, Apollo Client, Apollo Engine
+* Authorization goes into the Authorization header
+* user context aka `viewer` pattern
+* Localization goes into Accept-Language header
+* backend teams know how their servers are being used
+* frontend teams only pay for what they use, example at SSENSE with price field 
 
 ## Novelty
 
