@@ -125,7 +125,7 @@ enum Order_Status = {
 
 ### Object
 
-Object types are the workhorse of the schema, providing the means to create a set of named and typed fields that are modelling some domain.
+Object types provide the means to create a set of field names and their corresponding types that logically represent something concrete in the author's domain like a product, article, comment, or user. Unsurprisingly they tend to be the workhorse of an author's schema.
 
 ```
 type Product = {
@@ -139,9 +139,9 @@ type Product = {
 }
 ```
 
-### List a
+### List
 
-List types allow expressing many of something.
+List types allow expressing many of some value (Fun fact, this is sometimes referred to as a non-deterministic value).
 
 ```
 type SearchResult = {
@@ -290,6 +290,14 @@ If you do not have extensive experience modelling your data with Sum or Sum-like
 
 ### Input Object
 TODO
+
+## More about Interfaces and Unions
+
+* unions are good for modelling a field which may be of totally different types. For example an error or a value
+* interfaces are good for modelling a field which may be one of several related values, for example maybe socks shoes coats gloves glasses and so on all share a base interface type.
+* a nice feature of interfaces for clients making queries is that field type qualifications via e.g. inline fragments are not needed for interface-level fields. Only once the user wants fields particular to some type implementing the interface will they then need to break out into slightly more verbose query syntax.
+* Conversely a field which is a union type can only be queried upon with inline fragments which first qualify the type.
+* the effect on a query's verbosity probably shouldn't be the main concern however. Instead the domain itself should inform what the relationship of the data is and that in turn should inform how to model the data. For example I have seen one use-case for unions be putting errors inline with data such that a field can either be the data you requested or some error like authorization failure. Reference: TODO
 
 ## Anatomy of GraphQL Queries
 
