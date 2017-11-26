@@ -299,6 +299,17 @@ TODO
 * Conversely a field which is a union type can only be queried upon with inline fragments which first qualify the type.
 * the effect on a query's verbosity probably shouldn't be the main concern however. Instead the domain itself should inform what the relationship of the data is and that in turn should inform how to model the data. For example I have seen one use-case for unions be putting errors inline with data such that a field can either be the data you requested or some error like authorization failure. Reference: TODO
 
+## The tradeoffs of opt-in versus opt-out
+
+* GraphQL is unlike typical REST but similar to direct DB queries in that its an opt-in model rather than hard-coded results
+* This means that clients can expect their actual queries to grow in size in their codebase since they now need to be explicit about every piece of data they use. It is literally impossible to work with data that is not explicitly stated in the query.
+* While this appears at first like a step backwards for the needs of clients it turns out that the extra typing is a small price to pay for query result predictability.
+* There are other benefits too. Developers may have an easier time reading the code later since they won't have to wonder about the query results.
+* Tooling now has a standard way to generate application-level types by combining queries in the app with the server's schema definition.
+* Developers can also copy-paste into a tool like GraphiQL to interactively explore data, then copy-paste back into their code, forming a much tighter loop than you would get with e.g. Swagger.
+* Another benefit is that backend teams know precisely which field are popular or not, thus informing decisions about where to optimize or how to evolve a schema. Advantages like these seem to greatly outweigh the con of added verbosity in a few query sites.
+* another benefit for backend developers is evolving APIs becomes easier when you know anything you add will not be noticed by clients or bloat their results perhaps without them even knowing it.
+
 ## Anatomy of GraphQL Queries
 
 Hopefully you now have a sense of what GraphQL is. Lets survey some of its main features so that you have a deeper understanding of what it can and cannot do in more precise operational terms.
@@ -412,7 +423,6 @@ query product(id: $product_id, language: $language, region: $region) {
 ### Schema Driven Development
 
 Interestingly schema definitions like the examples we saw while introducing the type system or presenting the case study can be transformed into a functioning GraphQL server by https://github.com/apollographql/graphql-tools[Apollo GraphQL Tools]. This is a declarative way of creating a GraphQL service because you simply say what the interface is and it becomes so. Apollo has termed this approach https://www.apollographql.com/docs/graphql-tools/index.html#recommendations[the GraphQL-first philosophy].
-
 
 ## Novelty
 
