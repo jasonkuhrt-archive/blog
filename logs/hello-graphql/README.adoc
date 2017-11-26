@@ -122,6 +122,113 @@ enum Order_Status = {
 }
 ```
 
+
+### Object
+
+Object types are the workhorse of the schema, providing the means to create a set of named and typed fields that are modelling some domain.
+
+```
+type Product = {
+  id: ID
+  name: String
+  price: Float
+  countryOfManufacture: Country
+  brand: Brand
+  colour: Colour
+  gender: Gender
+}
+```
+
+### List a
+
+List types allow expressing many of something.
+
+```
+type SearchResult = {
+  products: [Product]
+}
+```
+
+### Non-Null
+
+Non-Null types allow expressing that a field will never be `null`. If you are familiar with Maybe types (sometimes called Option type) from Haskell Scala Rust Swift Elm and others then you can view this type as a kind of reversal. In most programming languages the possibility of `null` is opted in by the user, but in GraphQL every field is maybe null by default, forcing schema authors to opt-out when they don't want this type. So somewhat paradoxically `Non-Null` "types" are really a means of simplifying and stripping away type information from fields!
+
+Consider the following schema example:
+
+```
+query {
+  products: [Product]
+}
+```
+
+Ignoring the type of Product, statically typing the query result would look something like this, for example:
+
+In Flowtype:
+
+```typescript
+type QueryResultProducts = null | Array<null | Product>
+```
+
+In Haskell:
+
+```haskell
+type QueryResultProducts = Maybe [Maybe Product]
+```
+
+But if the GraphQL schema author now uses some `Non-Null` types for their schema:
+
+```
+query {
+  products: [Product!]!
+}
+```
+
+Look what happens to the static types of the query result:
+
+In Flowtype:
+
+```typescript
+type QueryResultProducts = Array<Product>
+```
+
+In Haskell:
+
+```haskell
+type QueryResultProducts = [Product]
+```
+
+Hopefully you can see now how `Non-Null` types in GraphQL are really a way to remove type information, not add it.
+
+When `null` is impossible client code is simplified becuase they have fewer edge cases to account for. But care should be taken by schema authors to not over-promise when designing their schema too. Firstly, changing a field type from not-nullable to nullable is a breaking change while the reverse is not. Secondly, null propagates up the tree of fields to the first nullable field. So if null occurs when it was guaranteed not to the data dropped on the result will likely be worse than had null been a more granular possibility. For example instead of a single item in a list having an image link field be null the entire list of items might become null instead.
+
+Both of these points are discussed in finer detail with examples by Caleb Meredith in https://medium.com/@calebmer/when-to-use-graphql-non-null-fields-4059337f6fc8[When to use GraphQL Non-Null Fields].
+
+
+### Interface
+
+Interface types allow expressing a set of fields that other Object types must have.
+
+```
+interface Product {
+  id: ID
+  name: String
+  price: Float
+  countryOfManufacture: Country
+  brand: Brand
+  colour: Colour
+  gender: Gender
+}
+
+type Bag implements Product {
+}
+
+type Shoe implements Product {
+}
+
+```
+
+This has multiple benefits. For schema authors working at scale Interfaces are a design tool helping them reason about data relationships and enforcing those relationships at the server level. For clients, interfaces allow queries on unions to be simplified in some cases.
+
 ### Union
 
 Union types allow expressing that a field may be one of several different Object types.
@@ -177,75 +284,12 @@ Alas in GraphQL we must cope with less general/flexible types, but thankfully ta
 
 If you do not have extensive experience modelling your data with Sum or Sum-like types you may find this article by Chad Austin useful: https://chadaustin.me/2015/07/sum-types/[Sum Types Are Coming: What You Should Know].
 
-### Interface
 
-Interface types allow expressing a set of fields that other Object types must have.
 
-```
-interface Product {
-  id: ID
-  name: String
-  price: Float
-  countryOfManufacture: Country
-  brand: Brand
-  colour: Colour
-  gender: Gender
-}
 
-type Bag implements Product {
-}
-
-type Shoe implements Product {
-}
-
-```
-
-This has multiple benefits. For schema authors working at scale Interfaces are a design tool helping them reason about data relationships and enforcing those relationships at the server level. For clients, interfaces allow queries on unions to be simplified in some cases.
-
-### Object
-
-Object types are the workhorse of the schema, providing the means to create a set of named and typed fields that are modelling some domain.
-
-```
-type Product = {
-  id: ID
-  name: String
-  price: Float
-  countryOfManufacture: Country
-  brand: Brand
-  colour: Colour
-  gender: Gender
-}
-```
-
-### List a
-
-List types allow expressing many of something.
-
-```
-type SearchResult = {
-  products: [Product]
-}
-```
-
-### Non-Null
-
-Maybe types are the default in GraphQL but may be opted out by specifying the field as not nullable.
-we can improve our previous `SearchResult` type from before by telling the client that search results will never be null and that results found will never be null.
-
-```
-type SearchResult = {
-  products: [Product!]!
-}
-```
-
-This makes life for the client easier because we have just removed two edge-cases that they previously had to worry about.
-
-While non-null simplifies what a client has to account for care should be taken by schema authors to not over-promise during design. Firstly, changing a field type from not-nullable to nullable is a breaking change while the reverse is not. Secondly, null propagates up the tree of fields to the first nullable field and so if null occurs when it was guaranteed not to the damage done on the result will likely be worse than had null been a field possibility. For example instead of a single item in a list having an image link field be null the entire result of items might become null instead.
-
-Both of these points are discussed in greater detail by Caleb Meredith in https://medium.com/@calebmer/when-to-use-graphql-non-null-fields-4059337f6fc8[When to use GraphQL Non-Null Fields].
 
 ### Input Object
+TODO
 
 ## Anatomy of GraphQL Queries
 
@@ -395,3 +439,4 @@ TODO
 * https://www.howtographql.com/
 * https://github.com/chentsulin/awesome-graphql[awesome-graphql]
 * https://twitter.com/tomdale/status/786951612053020672?lang=en
+* https://stackoverflow.com/questions/34726666/real-world-example-of-graphqlinterfacetype-and-graphqluniontype
