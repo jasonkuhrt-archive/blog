@@ -96,7 +96,7 @@ type Product {
 
 ### Enumeration
 
-An enumeration is a set of strings that a value may be. It is great for modelling strings with a controlled set of possible variations. A good candidate for enumerations can be strings that you see in code being tested for concrete matches like `gender == "men"` and `size == "xs"`.
+Enumeration types allow expressing that a field will be one of several different values. It is a better choice than a string when the possible values are within a controlled set. A good candidate for enumerations can be strings that you see in code being tested for concrete matches like `gender == "men"` and `size == "xs"`. An enumeration in GraphQL is like a scaler type in that it is a leaf of your query.
 
 ```
 Size = {
@@ -155,21 +155,32 @@ search(term:String) {
 
 We will answer this once we dive into queries.
 
-The union type in GraphQL has some similarities to Sum Types (AKA Tagged Union Types, variant Record, Discriminated Union, Disjoint Union) but is not as flexible given that it is constrained to being a union of just Object types. For example in the type systems of Haskell Rust Swift and many other programming languages special cased enumeration types are not necessary since Sum Types can represent them:
+You may also be wondering how this relates to Sum Types (AKA Tagged Union Types, variant Record, Discriminated Union, Disjoint Union). My take is that while GraphQL Union types have some similarities to Sum Types they are less flexible given that they are constrained to being a union of just Object types. By comparison, Sum Types in the type systems of Haskell Rust Swift and many other programming languages are effectively a superset of enums:
 
-
+1. Analog to GraphQL `Enumeration`:
++
 ```haskell
 type Size = S | M | L
 ```
++
 ```haskell
 type Gender = Male | Female
 ```
 
-Alas in GraphQL we must cope with less general and less flexible types, but thankfully taken together can still model our data with expressivity at least approaching Sum Types. I haven't yet taken the time to ask the community about how this design decision came to be but I expect there is a good underlying rationale that was the output of some thoughtful consideration! I suspect implications for the query language were a driving factor.
+2. Analog to GraphQL `Union`:
++
+```haskell
+type SearchResult = Product String String Float | Article String String String
+```
+
+Alas in GraphQL we must cope with less general/flexible types, but thankfully taken together can still model our data with expressivity at least approaching Sum Types. I haven't yet taken the time to ask the community about how this design decision came to be but I expect there is a good underlying rationale that was the output of some thoughtful consideration! For example perhaps implications for the query language were a driving factor?
 
 If you do not have extensive experience modelling your data with Sum or Sum-like types you may find this article by Chad Austin useful: https://chadaustin.me/2015/07/sum-types/[Sum Types Are Coming: What You Should Know].
 
 ### Interface
+
+
+
 ### Object
 ### Input Object
 ### List a
