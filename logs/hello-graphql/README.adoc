@@ -64,11 +64,111 @@ Many aspects of GraphQL that will need to be solved in production are intentiona
 
 ## Anatomy of GraphQL Schema
 
-### String
-### Float
-### Int
-### Enum
+This section will introduce GraphQL's type system.
+
+References:
+
+- https://github.com/sogko/graphql-schema-language-cheat-sheet[cheatsheet]
+
+### Scalers
+
+GraphQL has a base set of types that all other types are just compounds of. These base types are referred to as https://stackoverflow.com/questions/6623130/scalar-vs-primitive-data-type-are-they-the-same-thing[scalers] and are:
+
+* Int - signed 32-bit integer
+* String - UTF-8 character sequence
+* Float - signed double-precision floating-point value
+* Boolean - true or false
+* ID - a string for uniquely identifying something in a non-human-readable way
+
+A GraphQL implementation may also extend this set of scalers with new ones e.g. Email, Date, PhoneNumber, URL, etc.
+
+Example:
+
+```
+type Product {
+  id: ID
+  name: String
+  price: Float
+  stock: Int
+  tood: Boolean
+}
+```
+
+### Enumeration
+
+An enumeration is a set of strings that a value may be. It is great for modelling strings with a controlled set of possible variations. A good candidate for enumerations can be strings that you see in code being tested for concrete matches like `gender == "men"` and `size == "xs"`.
+
+```
+Size = {
+  S
+  M
+  L
+}
+```
+```
+enum Gender = {
+  MALE
+  FEMALE
+}
+```
+```
+enum Order_Status = {
+  INVOICED
+  PICKED
+  PACKED
+  SHIPPED
+  DELIVERED
+  RETURNED
+}
+```
+
 ### Union
+
+Union types allow expressing that a field may be one of several different Object types.
+
+Example:
+```
+type Product {
+  id: ID
+  name: String
+  price: Float
+}
+
+type Article {
+  id: ID,
+  title: String
+  author: String
+}
+
+union SearchResult = Product | Article
+```
+
+You may be wondering how one queries on such a type:
+
+```
+search(term:String) {
+  searchResult: {
+    # ... fields for Product or Article ...???
+  }
+}
+```
+
+We will answer this once we dive into queries.
+
+The union type in GraphQL has some similarities to Sum Types (AKA Tagged Union Types, variant Record, Discriminated Union, Disjoint Union) but is not as flexible given that it is constrained to being a union of just Object types. For example in the type systems of Haskell Rust Swift and many other programming languages special cased enumeration types are not necessary since Sum Types can represent them:
+
+
+```haskell
+type Size = S | M | L
+```
+```haskell
+type Gender = Male | Female
+```
+
+Alas in GraphQL we must cope with less general and less flexible types, but thankfully taken together can still model our data with expressivity at least approaching Sum Types. I haven't yet taken the time to ask the community about how this design decision came to be but I expect there is a good underlying rationale that was the output of some thoughtful consideration! I suspect implications for the query language were a driving factor.
+
+If you do not have extensive experience modelling your data with Sum or Sum-like types you may find this article by Chad Austin useful: https://chadaustin.me/2015/07/sum-types/[Sum Types Are Coming: What You Should Know].
+
 ### Interface
 ### Object
 ### Input Object
@@ -184,7 +284,12 @@ query product(id: $product_id, language: $language, region: $region) {
 * user context aka `viewer` pattern
 * Localization goes into Accept-Language header
 * backend teams know how their servers are being used
-* frontend teams only pay for what they use, example at SSENSE with price field 
+* frontend teams only pay for what they use, example at SSENSE with price field
+
+### Schema Driven Development
+
+Interestingly schema definitions like the examples we saw while introducing the type system or presenting the case study can be transformed into a functioning GraphQL server by https://github.com/apollographql/graphql-tools[Apollo GraphQL Tools]. This is a declarative way of creating a GraphQL service because you simply say what the interface is and it becomes so. Apollo has termed this approach https://www.apollographql.com/docs/graphql-tools/index.html#recommendations[the GraphQL-first philosophy].
+
 
 ## Novelty
 
