@@ -194,26 +194,21 @@ And so on.
 
 We have just seen some queries. Here are a few more:
 
-Find out for each product who has purchased it and what other products they have purchases:
+Get all brands, products of each brand, and all users who have purchased from each brand:
 
 ```
 query {
-  products: {
+  brands: {
     id
     name
+    products: {
+      id
+      name
+      price
+    }
     purchasers: {
-      user: {
-        id
-        name
-        purchases: {
-          id
-          price
-          brand: {
-            id
-            name
-          }
-        }
-      }
+      id
+      name
     }
   }
 ```
@@ -229,7 +224,8 @@ query {
       cityBasedIn
     }
     productsShippedTo: {
-
+      id
+      price
     }
     productsManufacturedIn: {
       id
@@ -253,25 +249,43 @@ Some things you might notice:
 
 . Queries may be running against a graph of data. This is not a requirement but for data that has inherit relationships it is the generally recommended way to design your GraphQL schema and hence why the word graph shows up in its name. That said its certainly possible to design a GraphQL schema that is not graph like at all.
 
-. Data is returned as a tree. If the data being queries is indeed a graph then the result can be seen as a sub-graph.
+. Data is returned as a tree. If the data being queried is indeed a graph then the result can be seen as a sub-graph.
+
+. List and Object types are queried with the exact same syntax. Clients will generally rely on the type system and on well named fields to reason about which fields are lists and which are objects. This may take some getting used for beginners.
 
 . The results of either query will contain many products multiple times due to the graph nature of the query. Backend implementations have various techniques to prevent double-fetching data in the process of resolving a query.
 
-#### Opt-in
+#### Tradeoffs of Field-level granularity
 
-* GraphQL is unlike typical REST but similar to direct DB queries in that its an opt-in model rather than hard-coded results
-* This means that clients can expect their actual queries to grow in size in their codebase since they now need to be explicit about every piece of data they use. It is literally impossible to work with data that is not explicitly stated in the query.
-* While this appears at first like a step backwards for the needs of clients it turns out that the extra typing is a small price to pay for query result predictability.
-* There are other benefits too. Developers may have an easier time reading the code later since they won't have to wonder about the query results.
-* Tooling now has a standard way to generate application-level types by combining queries in the app with the server's schema definition.
-* Developers can also copy-paste into a tool like GraphiQL to interactively explore data, then copy-paste back into their code, forming a much tighter loop than you would get with e.g. Swagger.
-* Another benefit is that backend teams know precisely which field are popular or not, thus informing decisions about where to optimize or how to evolve a schema. Advantages like these seem to greatly outweigh the con of added verbosity in a few query sites.
-* another benefit for backend developers is evolving APIs becomes easier when you know anything you add will not be noticed by clients or bloat their results perhaps without them even knowing it.
+As mentioned the field-level granularity of GraphQL is a huge departure from traditional REST APIs, and is worth considering a bit more before we move on.
 
-#### Examples
+Compared to REST the verbosity of queries will increase with GraphQL since every piece of data the client needs must be explicitly stated.
 
+But the payback for this seems to make this a great tradeoff.
 
+* Frontend engineers can literally see the shape of data they will receive.
 
+* It is now possible in a fairly general way for tools to generate application-level types by combining queries in the app with the GraphQL server's schema definition.
+
+* It is now possible in a fairly general way for tools to validate queries at dev time by sending them to the GraphQL server for validation as you write them.
+
+* Frontend engineers can copy-paste into a tools like https://github.com/graphql/graphiql[GraphiQL] to interactively explore data, then copy-paste back into their code.
+
+* Backend teams can now know precisely how much each field is used by clients. This can inform their decisions about which fields to optimize performance on or how to evolve a schema.
+
+* Backend teams are free to evolve the schema without having to worry that additions will bloat response payloads to client queries unbeknownst to the Frontend engineers responsible for application stability and performance.
+
+* Traditional caching techniques are not going to be as effective as in REST since there may be many permutations of client queries. The loss in traditional cache effectiveness will vary case by case particularly based on how many unique queries are reaching the GraphQL server. For instance a public GraphQL API might find little use for traditional cache systems whereas a private one for only one or two first party apps might fare quite fine. My take is that:
+
+. GraphQL exists in an age where the expectation on average backend system performance is higher given an industry with access to high performance languages (e.g. Go, Elixir, Node, ...)  and elastic infrastructure (Docker, Kubernetes, Cloud)
+
+. GraphQL exists in an age where real-time is become standard, and where cache is not as central as it used to be
+
+. Rather than having a fat cache layer at the top, strategical application-level caches (in-app or sidecar proxy deployments) are an alternative that especially make more sense in a world of micro-services and correspondingly micro-teams around them.
+
+. If the GraphQL server is fronting graph-like data then that means a single query can traverse potentially deeply into the graph. As such it is unclear if a single cache policy for all queries makes any sense. Instead it seems that GraphQL would be better suited to field-level caching.
+
+. The company Apollo has launched a proxy which provides cache features for Graphql called https://www.apollographql.com/engine/[Apollo engine]. Notably it does provide field-level caching policies.
 
 ## Intermediate Types and Queries
 
