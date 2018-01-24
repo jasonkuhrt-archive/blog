@@ -45,15 +45,6 @@ query Product(id: "ab781du3", language: EN) {
 . requested response fields are resolved into data
 . response is sent back
 
-### Subscriptions
-
-. client makes a request
-. request gets syntactically validated
-. request gets validated against schema
-. new subscriber for event source is registered
-. each event from source is executed against with originally given query
-. ...then the resolved data is sent back
-
 ## A Specification
 
 GraphQL is a specification that chiefly defines a type system and a query language.
@@ -64,7 +55,7 @@ Many aspects of GraphQL that will need to be solved in production are intentiona
 
 ## Basic Types and Queries
 
-This section will introduce a variety of types that schema authors can use to model their data. This section will also show how queries against this data look.
+We will start by looking at basic types and simple queries in GraphQL. These types are used by backend engineers to model a domain of underlying data that they are interested in exposing to clients. We refer to this overall application of types as the schema.
 
 ### Scalers
 
@@ -88,15 +79,15 @@ type Product {
   name: String
   price: Float
   stock: Int
-  TODO: Boolean
+  fairTrade: Boolean
 }
 ```
 
 ### Enumeration
 
-Enumeration types allow expressing that a field will be one of several different values. It may be a better choice than a string when the possible values are within a controlled set. For example if you see strings that are being tested for precise values such as `gender == "men"` or `size == "xs"` and the values are internal to your system an enumeration might be a good choice.
+Enumeration types allow expressing that a field will be one of several different values. It may be a better choice than a string when the possible values are within a controlled set. For example if you see strings that are being tested for precise values such as `gender == "men"` or `size == "xs"` and the values are internal to your system (that is, not free form user-submitted data etc.) an enumeration might be a good choice.
 
-An enumeration in GraphQL is like a Scaler type in that it is a leaf in the data graph, a datum that cannot be drilled down futher.
+An enumeration in GraphQL is like a Scaler type in that it is a leaf in the data graph, a datum that cannot be drilled down further.
 
 Here are some examples (note that uppercase here is pure style, void of semantics):
 
@@ -114,7 +105,7 @@ enum Gender = {
 }
 ```
 ```
-enum Order_Status = {
+enum OrderStatus = {
   INVOICED
   PICKED
   PACKED
@@ -143,7 +134,7 @@ type Product = {
 
 ### List
 
-List types allow expressing multiple of some type.
+List types allow expressing the possibility of none, one, or many of some type.
 
 ```
 type SearchResult = {
@@ -151,9 +142,9 @@ type SearchResult = {
 }
 ```
 
-### Query Object Type
+### The special Object Type named Query
 
-Every queryable schema will have at least one Object type specially named `Query`. Given this name, a special thing happens to the fields of this object: they become the top-level fields of this GraphQL server, also known as its entry-point. So with this in place it becomes possible for clients to begin a query against the data presented by GraphQL server starting with any one of the fields exposed in the Query Object type.
+Every queryable schema will have at least one Object type specially named `Query`. Given this name, a special thing happens to the fields of this object: they become the top-level fields of this GraphQL server, also known as its entry-point or root. So with this in place it becomes possible for clients to begin a query against the data presented by GraphQL server starting with any one of the fields exposed in the Query Object type.
 
 For example given this Query type:
 
@@ -162,7 +153,7 @@ type Query {
   users: [User]
   products: [Product]
   articles: [Article]
-  JobPostings: [JobPosting]
+  jobPostings: [JobPosting]
 }
 ```
 
@@ -192,7 +183,7 @@ And so on.
 
 ### Queries
 
-We have just seen some queries. Here are a few more:
+We have just seen some queries. Here are a few more. But note that these are all somewhat arbitrary given we're working with a subset of query features that omit some things many real-world queries would include.
 
 Get all brands, products of each brand, and all users who have purchased from each brand:
 
@@ -213,7 +204,7 @@ query {
   }
 ```
 
-Find out for each country various stats about our platform:
+Find out for each country various stats about our platform including users who have purchases from brands in that country and users who simply live in that country.
 
 ```
 query {
@@ -222,6 +213,10 @@ query {
       id
       name
       cityBasedIn
+      purchasers: {
+        id
+        name
+      }
     }
     productsShippedTo: {
       id
@@ -247,19 +242,19 @@ Some things you might notice:
 
 . Fields are explicitly listed. This is known as the _selection set_. Any field not in the selection set will not be part of the result. Therefore the shape of data being returned is self-evident in the query itself. This is vastly different than how most RESTful APIs work wherein endpoints have predetermined response data and finding out what that data is requires looking at documentation or executing a query.
 
-. Queries may be running against a graph of data. This is not a requirement but for data that has inherit relationships it is the generally recommended way to design your GraphQL schema and hence why the word graph shows up in its name. That said its certainly possible to design a GraphQL schema that is not graph like at all.
+. Queries may run against a graph of data. This is not a requirement but for data that has inherit relationships it is the generally recommended way to design your GraphQL schema and hence why the word graph shows up in its name. That said its certainly possible to design a GraphQL schema that is not graph like at all.
 
 . Data is returned as a tree. If the data being queried is indeed a graph then the result can be seen as a sub-graph.
 
-. List and Object types are queried with the exact same syntax. Clients will generally rely on the type system and on well named fields to reason about which fields are lists and which are objects. This may take some getting used for beginners.
+. List and Object types are queried with the exact same syntax. Clients will generally rely on the type system and on well named fields to reason about which fields are lists and which are objects. This may take some getting used to for beginners.
 
-. The results of either query will contain many products multiple times due to the graph nature of the query. Backend implementations have various techniques to prevent double-fetching data in the process of resolving a query.
+. The results of either query will contain many of the same products multiple times due to the graph nature of the query. Backend implementations have various techniques to prevent double-fetching data in the process of resolving a query.
 
 #### Tradeoffs of Field-level granularity
 
 As mentioned the field-level granularity of GraphQL is a huge departure from traditional REST APIs, and is worth considering a bit more before we move on.
 
-Compared to REST the verbosity of queries will increase with GraphQL since every piece of data the client needs must be explicitly stated.
+Compared to REST the verbosity of constructing a query in code will increase with GraphQL since every piece of data the client needs must be explicitly stated.
 
 But the payback for this seems to make this a great tradeoff.
 
@@ -269,7 +264,7 @@ But the payback for this seems to make this a great tradeoff.
 
 * It is now possible in a fairly general way for tools to validate queries at dev time by sending them to the GraphQL server for validation as you write them.
 
-* Frontend engineers can copy-paste into a tools like https://github.com/graphql/graphiql[GraphiQL] to interactively explore data, then copy-paste back into their code.
+* Frontend engineers can copy-paste into tools like https://github.com/graphql/graphiql[GraphiQL] to interactively explore data, then copy-paste back into their code.
 
 * Backend teams can now know precisely how much each field is used by clients. This can inform their decisions about which fields to optimize performance on or how to evolve a schema.
 
@@ -279,13 +274,16 @@ But the payback for this seems to make this a great tradeoff.
 
 . GraphQL exists in an age where the expectation on average backend system performance is higher given an industry with access to high performance languages (e.g. Go, Elixir, Node, ...)  and elastic infrastructure (Docker, Kubernetes, Cloud)
 
-. GraphQL exists in an age where real-time is become standard, and where cache is not as central as it used to be
+. GraphQL exists in an age where real-time is becoming standard, which has an inherent tension with cache.
 
 . Rather than having a fat cache layer at the top, strategical application-level caches (in-app or sidecar proxy deployments) are an alternative that especially make more sense in a world of micro-services and correspondingly micro-teams around them.
 
-. If the GraphQL server is fronting graph-like data then that means a single query can traverse potentially deeply into the graph. As such it is unclear if a single cache policy for all queries makes any sense. Instead it seems that GraphQL would be better suited to field-level caching.
+. If the GraphQL server is fronting graph-like data then that means a single query can traverse potentially deeply into the graph. In such a case a single cache policy like one might expect of RESTful endpoints doesn't make sense for GraphQL since all the data is accessible from a single endpoint. Instead it seems that GraphQL would be better suited to field-level caching. Notably this has happened via https://www.apollographql.com/engine/[Apollo engine] which is a proxy providing cache features for Graphql called.
 
-. The company Apollo has launched a proxy which provides cache features for Graphql called https://www.apollographql.com/engine/[Apollo engine]. Notably it does provide field-level caching policies.
+
+
+
+
 
 ## Intermediate Types and Queries
 
@@ -372,7 +370,6 @@ type Bag implements Product {
 
 type Shoe implements Product {
 }
-
 ```
 
 This has multiple benefits. For schema authors working at scale Interfaces are a design tool helping them reason about data relationships and enforcing those relationships at the server level. For clients, interfaces allow queries on unions to be simplified in some cases.
@@ -594,3 +591,4 @@ TODO
 - https://github.com/sogko/graphql-schema-language-cheat-sheet[cheatsheet]
 
 * https://stackoverflow.com/questions/34726666/real-world-example-of-graphqlinterfacetype-and-graphqluniontype
+* https://github.com/graphql/graphql-js/issues/207
