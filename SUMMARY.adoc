@@ -11,6 +11,7 @@
 
 ## Logs
 
+* link:logs/10-pairs-in-typescript/README.md[pairs fn in TypeScript]
 * link:logs/http-strict-transfer-security/README.adoc[HTTP Strict Transfer Security]
 * link:logs/incremental-feedback/README.adoc[Incremental Feedback]
 * link:logs/yarn-publish-woes/README.adoc[Yarn Publish Woes]
