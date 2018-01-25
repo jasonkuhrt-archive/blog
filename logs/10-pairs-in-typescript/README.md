@@ -2,7 +2,7 @@
 
 2018 Jan 23
 
-The following are some informal murmuring–simplified descriptions, stream of consciousness-esq–upon my experiences of trying to write a simple `pairs` function–transforms an object into a list of tuples–in TypeScript.
+The following are some informal murmuring, simplified descriptions, stream of consciousness-esq, upon my experiences of trying to write a simple `pairs` function (transforms an object into a list of tuples) in TypeScript.
 
 ## Keyof
 
@@ -49,16 +49,24 @@ Lets break this down.
 <A, B extends keyof A>
 ```
 
-We have two type parameters. The second is inferred from the first. TypeScript will try to infer the first one from the types of the caller supplied arguments as well. In practice if the compiler needs a hint the user may well supply a type argument to `A`, but likely never `B`.
+We have two type parameters. The second is inferred from the first. TypeScript will try to infer the first one from the types of the caller supplied arguments as well. In practice if the compiler needs a hint the user may well supply a type argument to `A`, but likely never need/want to for `B`.
 
-For example in the following `a` is correctly inferred as type `["a"|"b", number][]`:
+For example in the following:
 
 ```ts
 const data = { a: 1, b: 2 }
 const a = pairs(data)
 ```
 
-The second type parameter `B` starts by extracting the union of keys from `A` via `keyof` and then storing the result into the identifier B for later reference. Note the result here is not a value result but _type_ result [1]. I read `extends` as essentially `=`. I believe there is a lot more to it than this however. I've read in passing descriptions of `extends` as being for "sub-typing", providing "type constraints" etc. But for my immediate purpose my description seems sufficient, if minimally so.
+`a` is correctly inferred as type:
+
+```ts
+type a = ["a" | "b", number][]
+```
+
+But we won't talk about this return type just yet.
+
+The second type parameter `B` starts by extracting the union of keys from `A` via `keyof` and then storing the result into the identifier `B` for later reference. Note the result here is not a value result but _type_ result [1]. I read `extends` as essentially `=`. I believe there is a lot more to it than this however. I've read in passing descriptions of `extends` as being for "sub-typing", providing "type constraints" etc. But for my immediate purpose this description seems sufficient, if minimally so.
 
 Next:
 
@@ -74,12 +82,12 @@ Next:
 : [keyof A, A[B]][] =>
 ```
 
-We specify our return type. Lets break it down. You will agree hopefully that the ` [``] ` syntax is, unfortunately, heavily overloaded in meaning:
+We specify our return type. Lets break it down. The `[]` syntax is unfortunately heavily overloaded in meaning:
 
-1. [,] - A tuple (the outer first set of [])
-2. [] - A list (the outer trailing set of [])
-3. keyof A - Typing the first element of the tuple to be a union of the keys of `A`.
-4. A[B] - A type lookup into `A` using keys extracted from it and stored previously in `B` as we discussed above. The result here is a union of the values of `A`. Overall this is pretty magical to me. I just accept without much space to poke that a union of key names is passed into a lookup and produces a union of types of the values corresponding said keys...sure.
+1. `[,]` - A tuple (the outer first set of `[]`)
+2. `[]` - A list (the outer trailing set of `[]`)
+3. `keyof A` - Typing the first element of the tuple to be a union of the keys of `A`.
+4. `A[B]` - A type lookup into `A` using keys extracted from it and stored previously in `B` as we discussed above. The result here is a union of the values of `A`. Overall this is pretty magical to me. I just accept without much space to poke that a union of key names is passed into a lookup and produces a union of types of the values corresponding to said keys...sure.
 
 Next:
 
@@ -121,39 +129,32 @@ We read the own enumerable keys from `a`, map each one into a tuple, and finally
 [keyof A, A[B]][]
 ```
 
-## The result
+## Not perfect
 
-TODO
+Here is an example:
 
-## Unsafe Type Result
+```ts
+const myPairs = pairs({ a: 1, b: false, c: "a" })
+```
 
-TODO
+With the return type in this case:
 
-I learnt a few useful TypeScript skills in writing `pairs` but
+```ts
+type MyPairs = ["a" | "b" | "c", string | number | boolean]
+```
 
-type things = ["a", number] | ["b", boolean]
+At first this may look pretty good but unfortunately its not quite right. We have lost the valid combinations of pairs! Clearly incorrect combinations can be allowed without type error:
 
-type poop = {
-a: number
-}
+```ts
+myPairs.push(["a", "BUG"]) // This type checks!!
+```
 
-const test = <T>(a: {}): T => {
+But we should not be too surprised as the above type tells us as much. The type we really want returned for the above example is:
 
-return (a of type T?)
-}
+```ts
+type MyPairs = ["a", string] | ["b", false] | ["c", "a"]
+```
 
-test<poop>()
-
-type poopier <A> = {
-[K in keyof A]?: A[K]
-}
-
-type yay = things[]
-
-const myPairs = pairs({a:1, b:false, c: "a"})
-
-// const [name,value] = myPairs[0]
-// const typeIs = typeof value == "boolean"
-myPairs.push(["a", true])
+I do not know if this is possible to achieve in TypeScript. I also wonder if it would be possible to achieve in FlowType.
 
 [1] Coming from a dynamic language it takes some time to get used to the idea of effectively having a parallel language at play. Haskell for example is literally two langauges, the typed and untyped one, and has a whole set of type-level functions to play with.
