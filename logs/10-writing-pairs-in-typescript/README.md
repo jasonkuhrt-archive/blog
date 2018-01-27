@@ -155,6 +155,39 @@ But we should not be too surprised as the above type tells us as much. The type 
 type MyPairs = ["a", string] | ["b", false] | ["c", "a"]
 ```
 
-I do not know if this is possible to achieve in TypeScript. I also wonder if it would be possible to achieve in FlowType.
+At this point I was stuck without really knowing if I hit my limit of TypeScript knowledge or TypeScript's own limitation. I took this uncertainty to [StackOverflow](https://stackoverflow.com/questions/48435581/a-correct-pairs-function-in-typescript-or-flowtype/48437630#48437630) where I got a great answer by a nice fellow named [Tao](https://stackoverflow.com/users/2830131/tao).
+
+## StackOverflow
+
+It turns out TypeScript _can_ achieve my desired result:
+
+```ts
+type Pairs<T> = Array<{ [P in keyof T]: [P, T[P]] }[keyof T]>
+```
+
+Breaking this down:
+
+1. A type alias called `Pairs` with one type parameter `T`
+2. An array type of a mapped type going from `T` to `T2` where `T2` has the same keys but each key's type has been transformed into a tuple type of `[P, T[P]]`.
+3. A type lookup on the mapped type just introduced thereby transforming it from an object to a union of all its value types. Yes, we have nested type lookups.
+
+By step three we have almost accomplished our goal. To integrate `Pairs` type into `pairs` function we do this:
+
+```ts
+const pairs = <A extends Record<string, any>>(a: A): Pairs<A> => {
+  const mapper = (k: keyof A): [keyof A, A[keyof A]] => [k, a[k]]
+  return Object.keys(a).map(mapper)
+}
+```
+
+The only difference from before is:
+
+1. We constrain `A` to being an indexed object. This is just a general improvement not speicfic to Pairs type.
+2. We remove `B` type parameter because we no longer need it with `Pairs` type.
+3. We wrap our `A` in `Pairs` in the return type
+
+And voila.
+
+A parting thought I've had is about how much the type system in TypeScript makes sense to a developer versus say a mathematician. Indeed it seems that the `pairs` solution in TypeScript relies on "programming" your way through it. But how deep or shallow is this system really? There is a solution, but little else to say about it then "combine type mapping feature with nested use of type lookups". Serviceable! But leaves me wondering a bit about the theory.
 
 [1] Coming from a dynamic language it takes some time to get used to the idea of effectively having a parallel language at play. Haskell for example is literally two langauges, the typed and untyped one, and has a whole set of type-level functions to play with.
