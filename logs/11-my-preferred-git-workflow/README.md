@@ -1,10 +1,8 @@
-# My preferred git workflow
+# My optimal workflow
 
 2018 Feb 19
 
-I have been using git and github since my first days playing around with code. I never knew a world without them. I heard tales of SVN, Google Code, SourceForge, and others, sometimes in unflattering terms. This lack of storied history, blood sweat and tears, meant that whatever lessons Git and Github were built upon was something I took for granted. But this new era was not free from its own forms of [rope to shoot yourself in the foot](https://openlibrary.org/books/OL798906M/Enough_rope_to_shoot_yourself_in_the_foot) with. In particular perhaps [Git](https://www.reddit.com/r/NoStupidQuestions/comments/5uytm9/why_is_git_so_hard_to_understand/) [was](https://stevebennett.me/2012/02/24/10-things-i-hate-about-git/) [not](https://news.ycombinator.com/item?id=4200492) [as](https://www.quora.com/Why-is-Git-so-popular-despite-it-being-more-complicated-and-harder-to-learn-compared-to-other-types-of-source-controls) [easy](http://merrigrove.blogspot.ca/2014/02/why-heck-is-git-so-hard-places-model-ok.html) as it could have been at times... And while [valient efforts](https://datasift.github.io/gitflow/IntroducingGitFlow.html) were made to rectify the situation its not clear to me if things improved or got worse.
-
-The following is my modest take on the field and how I prefer to work with Git and Github. I have no novel ideas to submit. Just observations and cherry-picks from awesome work done by others in the field. My curation aims for the maximum benefit-to-simplicity ratio.
+The following is my preferred take on software workflow topics as it relates to git, github, and changelogs. It surely is not a universal fit for all types of projects but in my experience would seem to cover the vast majority. That said I have no novel ideas to submit. Just cherry-picks from my observations of great work done by others in the field. My curatorial sensibilities bias toward the point of optimal benefit-to-simplicity ratio.
 
 ## The Flow
 
@@ -66,7 +64,10 @@ It tries to adhere to the following principals:
 
    * Encourages small quality changes since they're easy to make. If change is laborious expect to see less of it and/or in larger batches. A poorly written documentation paragraph, a promiscuous function signature, a missing test case, a dependency upgrade, a refactor, ... these sorts of things could be dissuaded by complexity and/or may more often be batched into unrelated pull-requests.
 
-7. TODO talk about branch/commit/pr title conventions
+7. **Commit messages further automate the flow**
+   * Keep references to PR for commit history
+   * Describe the semver effect to automate changelog later
+   * [Optionally close issues automatically](https://help.github.com/articles/closing-issues-using-keywords/) (but PR description is often the better place to do this)
 
 ### References
 
