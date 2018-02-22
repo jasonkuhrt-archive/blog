@@ -64,10 +64,16 @@ It tries to adhere to the following principals:
 
    * Encourages small quality changes since they're easy to make. If change is laborious expect to see less of it and/or in larger batches. A poorly written documentation paragraph, a promiscuous function signature, a missing test case, a dependency upgrade, a refactor, ... these sorts of things could be dissuaded by complexity and/or may more often be batched into unrelated pull-requests.
 
-7. **Commit messages further automate the flow**
-   * Keep references to PR for commit history
-   * Describe the semver effect to automate changelog later
-   * [Optionally close issues automatically](https://help.github.com/articles/closing-issues-using-keywords/) (but PR description is often the better place to do this)
+7. **Automate flow with natural queues**
+
+   * Close issues automatically when PR merged [ref](hthttps://github.com/blog/1506-closing-issues-via-pull-requests)
+   * Automatically keep references to PR in commit message. PR contains the various feature branch commits unsquashed
+   * Describe the semver effect in commit message to automate changelog later
+
+8. Automate Style enforcement
+
+   * [Use prettier](https://prettier.io/)
+   * Use githook to run prettier prior to commit ([ref](https://prettier.io/docs/en/precommit.html)). The Husky + `pretty-quick` approach has worked great for me so far.
 
 ### References
 
