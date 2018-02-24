@@ -1,32 +1,44 @@
-# My optimal workflow
+# A workflow that optimizes for simplicity
 
 2018 Feb 19
 
-The following is my preferred take on software workflow topics as it relates to git, github, and changelogs. It surely is not a universal fit for all types of projects but in my experience would seem to cover the vast majority. That said I have no novel ideas to submit. Just cherry-picks from my observations of great work done by others in the field. My curatorial sensibilities bias toward the point of optimal benefit-to-simplicity ratio.
+<!-- TOC START min:2 max:3 link:true update:true -->
 
-## The Flow
+* [Principals](#principals)
+* [Flow Diagram](#flow-diagram)
+* [Breakdown](#breakdown)
+  * [Add a feature](#add-a-feature)
+  * [Make a release](#make-a-release)
+* [Rationale](#rationale)
+* [Future improvements](#future-improvements)
+* [References](#references)
 
-### Principals
+<!-- TOC END -->
 
-It tries to adhere to the following principals:
+The following is my preferred workflow on software projects. It likely isn't a universal fit for all shapes and sizes but in my experience this or variants of it have worked quite well for me. I strive for the optimal benefit-to-simplicity ratio.
 
-1. **Low & inclusive barrier to collaboration**
-   The more complicated the process, the more people feel blocked from participating.
+## Principals
 
-2. **Tooling over conventions**
-   Avoid manual human policing/maintenance. Make things foolproof. We're human so what can go wrong will go wrong. [Murphy told us that](https://en.wikipedia.org/wiki/Murphy%27s_law).
+1. **Remove steps**
+   Keep thing simple. Complicated or even semi-complicated workflows attempting to "fix" perceived risks may just end up complicating matters by making the surface area for erring even larger. Also the more complicated the process, the greater the risk of dampened collaboration.
 
-3. **Simplicity for safety**
-   Complicated or even semi-complicated workflows attempting to "fix" perceived risks may just end up complicating matters by making the surface area for screwing up even larger. The worst-case scenario is non-simple workflows based on convention.
+2. **Automate steps**
+   Do not waste time policing that rules are remembered and followed correctly. We're human. What can go wrong will go wrong. [Murphy told us that](https://en.wikipedia.org/wiki/Murphy%27s_law). Use tooling to stop thinking about this.
 
-4. **Standardize along the cow path**
-   Use a simple approach that covers vast majority of cases, leaving the genuinely weird cases to live in their own ad-hoc quarantine.
+3. **Standardize along the cow path**
+   Use a simple approach that covers vast majority of cases. Edge cases ought to live in case-by-case procedures, rather than diluting the central pathway.
 
-### Diagram
+## Flow Diagram
 
 ![diagram](./diagram2.png)
 
-### Breakdown
+## Breakdown
+
+### Add a feature
+
+### Make a release
+
+## Rationale
 
 1. **Follows a battle-tested pattern popularized by Github ([ref](https://guides.github.com/introduction/flow/))**
 
@@ -35,10 +47,9 @@ It tries to adhere to the following principals:
 
 2. **Master as base branch**
 
-   * Aligns with tooling defaults (for example `hub pull-request`)
-   * Makes it practically impossible to not know which brach to pull-request too for the vast majority of cases
-   * Makes it so there is only one branch to [protect](https://help.github.com/articles/about-protected-branches/) (excepting the odd and few version branches)
-   * TBD makes it possible to leverage repo settings to automatically guarantee a single PR merging style (if there were multiple kinds of PR flows into bases with varying standards as prescribed by some git flows then repo settings wouldn't be able to enforce for a single style thereby passing the buck to humans to manually police)
+   * Aligns with tooling defaults (for example `hub pull-request`).
+   * Makes it practically impossible to not know which brach to pull-request too for the vast majority of cases.
+   * Makes it so there is only one branch to [protect](https://help.github.com/articles/about-protected-branches/) (excepting the odd and few version branches).
 
 3. **Squash-merge pull-requests ([ref](https://help.github.com/articles/about-pull-request-merges/#squash-and-merge-your-pull-request-commits))**
 
@@ -53,6 +64,7 @@ It tries to adhere to the following principals:
 
    * Simple.
    * Aligns with continuous delivery workflows where work should constantly be going to production on `master`.
+   * Makes it possible to use repo settings to automatically enforce repo settings. I have seen cases where the PR merge style used to mainline versus another branch type like releases had different policies. There is no way to enforce that on Github however so you end up with more complex branches with less guarantee.
 
 5. **Can be used for repos both internal and open-source repos**
 
@@ -75,7 +87,11 @@ It tries to adhere to the following principals:
    * [Use prettier](https://prettier.io/)
    * Use githook to run prettier prior to commit ([ref](https://prettier.io/docs/en/precommit.html)). The Husky + `pretty-quick` approach has worked great for me so far.
 
-### References
+## Future improvements
+
+* Prune local branches with `git sync` once https://github.com/github/hub/issues/1304
+
+## References
 
 * [hub](https://github.com/github/hub)
 * [release](https://github.com/zeit/release)
