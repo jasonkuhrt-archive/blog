@@ -17,7 +17,7 @@
   * [Automate flow with natural queues](#automate-flow-with-natural-queues)
 * [References](#references)
 
-This is my preferred workflow on software projects. It likely isn't a universal fit for all shapes and sizes but in my experience this or variants of it have worked well for me. This is just a slightly more opionated version of [Github Flow](https://guides.github.com/introduction/flow/).
+This is my preferred workflow on software projects. It likely isn't a universal fit for all shapes and sizes but in my experience this or variants of it have worked well for me. This is just a slightly more opinionated version of [Github Flow](https://guides.github.com/introduction/flow/).
 
 ![wide diagram](./diagram.png)
 
