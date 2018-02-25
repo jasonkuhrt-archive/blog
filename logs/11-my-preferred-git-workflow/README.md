@@ -17,7 +17,9 @@
   * [Automate flow with natural queues](#automate-flow-with-natural-queues)
 * [References](#references)
 
-The following is my preferred workflow on software projects. It likely isn't a universal fit for all shapes and sizes but in my experience this or variants of it have worked well for me.
+This is my preferred workflow on software projects. It likely isn't a universal fit for all shapes and sizes but in my experience this or variants of it have worked well for me. This is just a slightly more opionated version of [Github Flow](https://guides.github.com/introduction/flow/).
+
+![wide diagram](./diagram.png)
 
 ## Principals
 
@@ -29,10 +31,6 @@ The following is my preferred workflow on software projects. It likely isn't a u
 
 3. **Standardize along the cow path**
    Use a simple approach that covers vast majority of cases. Edge cases ought to live in case-by-case procedures, rather than diluting the central pathway.
-
-## Diagram
-
-![wide diagram](./diagram2.png)
 
 ## General Rationales
 
@@ -96,6 +94,7 @@ The following is my preferred workflow on software projects. It likely isn't a u
 
 ## References
 
+* [Github Flow](https://guides.github.com/introduction/flow/)
 * [hub](https://github.com/github/hub)
 * [release](https://github.com/zeit/release)
 * [squash-merge](https://help.github.com/articles/about-pull-request-merges/#squash-and-merge-your-pull-request-commits)
