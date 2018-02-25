@@ -13,3 +13,12 @@
 .imageblock .content {
   text-align: center;
 }
+
+.markdown-section {
+  overflow: visible;
+}
+
+.markdown-section img[alt~="wide"] {
+  max-width: 200%;
+  margin-left: -50%;
+}
