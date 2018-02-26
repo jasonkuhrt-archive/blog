@@ -19,3 +19,4 @@
 * link:logs/untyped-javascript-for-now/README.adoc[Untyped JavaScript For Now]
 * link:logs/testem-karma-simplicity/README.adoc[Karma, Testem, Non-Simplicity]
 * link:logs/sni-tls-cloudfront/README.adoc[SNI, TLS & CloudFront]
+* link:logs/the-bottom-of-record-syntax/README.md[The Bottom of Record Syntax]
