@@ -11,6 +11,7 @@
 
 ## Logs
 
+* link:logs/12-multi-stage-docker-builds/README.md[Multi-Stage Docker Builds]
 * link:logs/11-my-preferred-git-workflow/README.md[My preferred Git workflow]
 * link:logs/10-writing-pairs-in-typescript/README.md[Writing pairs in TypeScript]
 * link:logs/http-strict-transfer-security/README.adoc[HTTP Strict Transfer Security]
