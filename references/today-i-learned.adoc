@@ -11,6 +11,22 @@ At the risk of stating the obvious this format is nothing new. Surely most think
 
 **2018 Mon Mar 5**
 
+##### hub issue
+
+* Finally played with `git issue` command via `hub`
+* Up to now had only even played with `gh is`
+* Nothing against `gh` but nice to have `issue` available in `hub` so that I don't _need_ node etc. deps for this functionality
+* Also seems fastesr than I remember `gh is` being though unclear if its IO related e.g. Github API got faster
+
+image::./assets/git-issue.png[git-issue command output]
+
+
+
+
+
+
+**2018 Sun Mar 4**
+
 * on my mind lately:
   * Just Do It
   * Graph theory and graph implementations for brand adjacency feature
