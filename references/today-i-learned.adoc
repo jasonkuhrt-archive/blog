@@ -9,6 +9,20 @@ At the risk of stating the obvious this format is nothing new. Surely most think
 
 ## Entries
 
+**2018 Mon Mar 5**
+
+* on my mind lately:
+  * Just Do It
+  * Graph theory and graph implementations for brand adjacency feature
+  * How does an organization govern its technical evolution (technique, tools, ...)
+  * Use questionaries to drive own personal profile page
+  * Use aspects of profile I might want to explain or share as basis for blog posts
+  * Make a PR to immer to convert to TypeScript [as per request](https://github.com/mweststrate/immer/issues/67)
+  * tree shake ramda functions at library level rather than reinventing wheel
+  * Polymath Inc
+  * Solo blog to group blog to freelance to consultancy to service company to startup to freedom
+  * Use my repeatedly validated visualization skills to explore and teach technical topics
+
 **Wed Nov 15**
 
 * Have been playing with Most.js again recently. A new engine published as http://mostcore.readthedocs.io/en/latest/[`@most/core`] recently hit 1.0 and will be the basis for `most@2.0`.
