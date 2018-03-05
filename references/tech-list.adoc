@@ -11,3 +11,14 @@
 * https://www.siteleaf.com
 * https://www.contentful.com
 * https://graphcms.com
+
+## Functional Programming
+
+### Strongly Typed
+* Kotlin
+* Scala
+* Haskell
+
+### Dynamicly Typed
+* Clojure
+* Elixir
