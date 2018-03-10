@@ -9,6 +9,54 @@ At the risk of stating the obvious this format is nothing new. Surely most think
 
 ## Entries
 
+**2018 Thu Mar 8**
+
+* Got scolded today for hyping instead of doing. Good reminder. Show, don't tell, and be your own primary source rather than citing opinions of others.
+
+##### Forto + Rollup
+
+Refactoring some util functions in `forto`. Realized I could be getting functions like `mapObject` from a library like `ramda` without bloating `forto` with their deps. Question was, how to make the libarary calls be inlined?
+
+```ts
+import rollupTypesript from "rollup-plugin-typescript"
+import typescript from "typescript"
+import resolve from "rollup-plugin-node-resolve"
+import * as F from "ramda"
+
+const pkg = require("./package.json") // [1]
+const external = F.keys(F.omit(["ramda"], pkg.dependencies)) // [2]
+
+export default {
+  input: "source/Main.ts",
+  plugins: [
+    rollupTypesript({
+      typescript,
+    }),
+    resolve(),
+  ],
+  external, // [3]
+  output: [
+    {
+      file: pkg.main,
+      format: "umd",
+      name: pkg.name,
+      sourcemap: true,
+    },
+    {
+      file: pkg.module,
+      format: "es",
+      sourcemap: true,
+    },
+  ],
+}
+```
+
+1. Read in `package.json` to get access to all the dependency names
+2. Read said deps, but omit ramda
+3. Expose this list of dep names to rollup. What Rollup does in turn is not try to tree shake imports coming from these packages. However since we did not mark `ramda` as external, all `ramda` imports will be tree shaken which is exactly what we want for that dep.
+
+Still, there are hundrends upon hundreds of lines of code added. For a lean library this still seems unacceptable. I also tried to see if I would fare better with lodash but instead the situation is actually https://medium.com/@martin_hotell/tree-shake-lodash-with-webpack-jest-and-typescript-2734fa13b5cd[more complex].
+
 **2018 Mon Mar 5**
 
 ##### hub issue
@@ -19,11 +67,6 @@ At the risk of stating the obvious this format is nothing new. Surely most think
 * Also seems fastesr than I remember `gh is` being though unclear if its IO related e.g. Github API got faster
 
 image::./assets/git-issue.png[git-issue command output]
-
-
-
-
-
 
 **2018 Sun Mar 4**
 
