@@ -2,7 +2,7 @@
 
 ## References
 
-* link:references/today-i-learned.adoc[Today I Learned]
+* link:references/today-i-learned.md[Today I Learned]
 
 ## Essays
 
