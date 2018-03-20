@@ -6,17 +6,21 @@ Also known as TIL, this stream records some of my personal learnings at a granul
 
 At the risk of stating the obvious this format is nothing new. Surely most thinkers (great or otherwise) from ancient to modern times have maintained some sort of log, journal, notebook, or whatever. In my contemporary setting I have had direct influence from others practicing this kind of TIL e.g. [jbranchaud](https://github.com/jbranchaud/til/commits/master), [thoughtbot](https://github.com/thoughtbot/til), [milooy](https://github.com/milooy/TIL).
 
+## 2018 Tue Mar 20
+
+Took on the teacher role yesterday. Topic was about delivering change to master branch in a project. Thinking about the exchange. Noted that resistance/stubborness from the student probably should not be met with authority or call to seniority. For example "trust me, just do x". Or "no, you're wrong, I've been doing this for years and its like x". Either you can convince the student with rationale on-the-table debate or you cannot. If you cannot it might be the teacher's problem, not the students'. It seems like a useful default for the teacher is that its always their fault and that the ownus is on them to genuinely convince through rationale debate. Of course sometimes the student will be closed, blinded by ego, carry some implicit or explicit bias, etc. however this cause of communication failure, when it happens, should not be the rule used by the teacher but rather the exception. Further, upon failure or even without it, the teacher should be open to their being in fact wrong, with insight coming from the student. In other words teaching should be seen as a collaboration between student and teacher. This lowers the standing of the teacher in hierarchical terms but increases their credibility with the student and makes possible a learning that is closer to the student's needs and context rather than a one way didactic monologue which risks being lost upon the student.
+
 ## 2018 Mon Mar 12
 
 ##### Carefully `alter`
 
 Had some kind of issue with a MySQL table today. Possibly because of a bad `ALTER`. Attempted a column alteration from `VARCHAR` to `INT` with length `11` but my db client application (MacOS, Sequel Pro) hung at this point. I force quit but since then I think the table has been unloadable. Attempting to access says loading indefinetely. Will investigate solution tomorrow but lesson today. Next time doing alter:
 
-1. copy table structure to new temp table
-2. make alterations
-3. copy data
-4. delete old table
-5. rename new table to old
+1.  copy table structure to new temp table
+2.  make alterations
+3.  copy data
+4.  delete old table
+5.  rename new table to old
 
 ##### Haskell `let` v `where`
 
@@ -36,9 +40,9 @@ Prelude
 <interactive>:5:1: error: Variable not in scope: b
 ```
 
-1. We assign an expression to `a` which itself contains a let binding assigned `2` to `b`. We just return `b` there.
-2. We prove that `a` has been assigned the bound value to `b`
-3. We prove that the binding `b` was local to the expression within assignment to `a`.
+1.  We assign an expression to `a` which itself contains a let binding assigned `2` to `b`. We just return `b` there.
+2.  We prove that `a` has been assigned the bound value to `b`
+3.  We prove that the binding `b` was local to the expression within assignment to `a`.
 
 On the other hand since `where` is bound to syntactic structure it can provide some unique affordances to the user. For example it introduces variables across function pattern matches:
 
@@ -128,9 +132,9 @@ export default {
 }
 ```
 
-1. Read in `package.json` to get access to all the dependency names
-2. Read said deps, but omit ramda
-3. Expose this list of dep names to rollup. What Rollup does in turn is not try to tree shake imports coming from these packages. However since we did not mark `ramda` as external, all `ramda` imports will be tree shaken which is exactly what we want for that dep.
+1.  Read in `package.json` to get access to all the dependency names
+2.  Read said deps, but omit ramda
+3.  Expose this list of dep names to rollup. What Rollup does in turn is not try to tree shake imports coming from these packages. However since we did not mark `ramda` as external, all `ramda` imports will be tree shaken which is exactly what we want for that dep.
 
 Still, there are hundrends upon hundreds of lines of code added. For a lean library this still seems unacceptable. I also tried to see if I would fare better with lodash but instead the situation is actually [more complex](https://medium.com/@martin_hotell/tree-shake-lodash-with-webpack-jest-and-typescript-2734fa13b5cd).
 
@@ -292,10 +296,10 @@ However at least one advantage of type aliases in TypeScript is that they can al
 
 * The core concepts are:
 
-  1. `volume classes` (`vc`)
-  2. `persistent volumes` (`pv`) based on `vc`
-  3. persistent volume claims`(`pvc`) based on`pvc`.`pod`specs that specify volumes based on`pvc`
-  4. `container`specs (within pod specs) that specify`volumeMounts`based on` pod``volumes `
+  1.  `volume classes` (`vc`)
+  2.  `persistent volumes` (`pv`) based on `vc`
+  3.  persistent volume claims`(`pvc`) based on`pvc`.`pod`specs that specify volumes based on`pvc`
+  4.  `container`specs (within pod specs) that specify`volumeMounts`based on` pod``volumes `
 
 * So each of these is based upon the former until `vc` hits the raw layer of whatever the kubernetes is hosted upon.
 
