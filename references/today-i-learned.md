@@ -1,10 +1,47 @@
 # Today I Learned
 
-#### About
+##### About
 
 Also known as TIL, this stream records some of my personal learnings at a granular level. This acts a way to improve retention, share what I have been doing, motivate or help maintain my learning momentum, act as a track record of discipline (or lack thereof), and in the large contribute to a backlog of data that may help me better know thyself in the future.
 
 At the risk of stating the obvious this format is nothing new. Surely most thinkers (great or otherwise) from ancient to modern times have maintained some sort of log, journal, notebook, or whatever. In my contemporary setting I have had direct influence from others practicing this kind of TIL e.g. [jbranchaud](https://github.com/jbranchaud/til/commits/master), [thoughtbot](https://github.com/thoughtbot/til), [milooy](https://github.com/milooy/TIL).
+
+## 2018 Thu Apr 12
+
+Been learning Python this week. Also been learning about the medical world and telemedicine.
+
+##### Python
+
+* [`pytest`](https://docs.pytest.org/en/latest/) is a test framework/runner that comes installed with python. Its job appears to be to provide a command line tool, a concept of fixtures, ability for test functions to inject those fixtures as arguments, many other things like the concept of marks which is essentially a way of tagging test functions for targeting later on e.g. `pytest -m "not integration"` would run all tests except those marked with `integration`.
+
+  ```python
+  # fixtures.py
+
+  @pytest.fixture
+  def foobar():
+    return 1
+
+  # tests.py
+
+  # foobar is magically dependency injected
+  def test_whatever(foobar):
+    assert foobar === 1
+  ```
+
+* Python has the concept of `yield` and `with`. This is akin to ruby's concept of passing blocks to functions for execution. It has nothing to do with `yield` in JavaScript which has to do with generators.
+
+  ```python
+  def demo_yielding_to_foobar():
+    with yielder():
+      run().some().code()
+
+  def yielder():
+    yield # block of code passed will run here!
+  ```
+
+* [`unittest`](https://docs.python.org/3.6/library/unittest.html) was a community library that became standardized in the langauge in Pythong 3.3 or some such. It provides mocking facilities, patching of imported dependencies, its own test runner and test discover features. It seems that pytest is a bit more robust from a framework runner POV. That said it supports using `unittest` anyways.
+
+* Python seems to have a lot of quality of life features in its tooling such as conventional file names to function as entrypoints to tests, program, etc. `__init__.py` is an entrypoint file a program.
 
 ## 2018 Tue Mar 20
 
