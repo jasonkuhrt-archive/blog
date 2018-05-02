@@ -6,6 +6,43 @@ Also known as TIL, this stream records some of my personal learnings at a granul
 
 At the risk of stating the obvious this format is nothing new. Surely most thinkers (great or otherwise) from ancient to modern times have maintained some sort of log, journal, notebook, or whatever. In my contemporary setting I have had direct influence from others practicing this kind of TIL e.g. [jbranchaud](https://github.com/jbranchaud/til/commits/master), [thoughtbot](https://github.com/thoughtbot/til), [milooy](https://github.com/milooy/TIL).
 
+## 2018 Tue May 1
+
+Continued learnings into Python, AWS, Serverless.
+
+##### Python tooling
+
+* PEP is an acronym for Python Enhancement Proposal
+* PEP8 is a style guide for python code dating back to 2001
+* There are various lint tools that enforce PEP8; `pycodestyle`, `pydocstyle`, `pyflakes`, `pylint`, `pychecker`
+* [`flake8`](https://github.com/PyCQA/flake8) is an aggregate tool tying `pyflakes`, `mccabe` and third party plugins
+* [`autopep8`](https://github.com/hhatto/autopep8) is a tool that automatically fixes style errors (anything not conforming to pep8). Another is `pep8ify`.
+* There is a newer auto-formatting tool called [`yapf`](https://github.com/google/yapf) from an engineer at Google. It seems to go further than `autopep8`. One idea behind it is that PEP8 alone does not ensure nicely formatted code. Uses [`clang-format`](https://clang.llvm.org/docs/ClangFormat.html) under the hood. Says itself is similar in idea to `gofmt` in that it aims to end "holy wars about formatting"; quote:
+
+  > if the whole codebase of a project is simply piped through YAPF whenever modifications are made, the style remains consistent throughout the project and there's no point arguing about style in every code review.
+
+  Demo [here](https://yapf.now.sh/).
+
+* One thing that `yapf` will not copy from `gofmt` [is import formatting](https://github.com/google/yapf/issues/385), so another tool exists for that, for years, called [`isort`](https://github.com/timothycrosley/isort).
+* Python got [type hints in 3.5](https://www.python.org/dev/peps/pep-0484/). It just exposes type info for tools to leverage.
+* The leading tool for that appears to be [`mypy`](http://mypy-lang.org/) whose core team is paid by Dropbox.
+* Dropbox released [`PyAnnotate`](http://mypy-lang.blogspot.ca/2017/11/dropbox-releases-pyannotate-auto.html) which runs a program and deduces the static types. Useful for large existing programs.
+* Finally a general intelligence tool (static analysis, autocomplete) for Python that is modern and popular is [`jedi`](https://github.com/davidhalter/jedi).
+* Atom IDE plugin for python relies upon [Python Language Server](https://github.com/palantir/python-language-server) which ties all the above tools together.
+
+##### Dynamodb
+
+* Dynamodb has the ability to observe table changes in realtime.
+* This is called Dynamodb Streams
+* AWS Lambda can be made to run on every table change.
+* Under the hood AWS Lambda polls dynamodb four times per second. This means worst-case reaction latency of 250ms.
+* Dynamodb has a TTL feature since January 2017. When keys expire dynamodb will delete them but only in an enventually consistent way. Specifically, AWS documentation says that expired entries will be deleted within 48 hours of expiration. Since TTL is based on an entry attribute in ISO standard time format, read queries can work around this limitation by using a filter operation that checks if time `now` is past entry `ttl` deadline.
+* The above workaround for reads does not help Dynamodb Streams which presumably will not know about expired entries until the eventual automatic delete by Dynamodb. There doesn't seem to be any AWS documentation suggesting otherwise.
+* relevant links:
+
+  * [AWS Dynamodb TTL + Dynamodb Streams](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/time-to-live-ttl-streams.html)
+  * [AWS Dynamodb TTL](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TTL.html)
+
 ## 2018 Thu Apr 12
 
 Been learning Python this week. Also been learning about the medical world and telemedicine.
@@ -136,13 +173,13 @@ foo a =
 Refactoring some util functions in `forto`. Realized I could be getting functions like `mapObject` from a library like `ramda` without bloating `forto` with their deps. Question was, how to make the libarary calls be inlined?
 
 ```ts
-import rollupTypesript from "rollup-plugin-typescript"
-import typescript from "typescript"
-import resolve from "rollup-plugin-node-resolve"
-import * as F from "ramda"
+import rollupTypesript from "rollup-plugin-typescript";
+import typescript from "typescript";
+import resolve from "rollup-plugin-node-resolve";
+import * as F from "ramda";
 
-const pkg = require("./package.json") // [1]
-const external = F.keys(F.omit(["ramda"], pkg.dependencies)) // [2]
+const pkg = require("./package.json"); // [1]
+const external = F.keys(F.omit(["ramda"], pkg.dependencies)); // [2]
 
 export default {
   input: "source/Main.ts",
@@ -166,7 +203,7 @@ export default {
       sourcemap: true,
     },
   ],
-}
+};
 ```
 
 1.  Read in `package.json` to get access to all the dependency names
