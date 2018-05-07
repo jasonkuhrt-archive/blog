@@ -6,6 +6,64 @@ Also known as TIL, this stream records some of my personal learnings at a granul
 
 At the risk of stating the obvious this format is nothing new. Surely most thinkers (great or otherwise) from ancient to modern times have maintained some sort of log, journal, notebook, or whatever. In my contemporary setting I have had direct influence from others practicing this kind of TIL e.g. [jbranchaud](https://github.com/jbranchaud/til/commits/master), [thoughtbot](https://github.com/thoughtbot/til), [milooy](https://github.com/milooy/TIL).
 
+## 2018 Tue May 6
+
+Pull-Request to apply some new personal knowledge about Python tooling. Exposed to some Python videos.
+
+##### Automatically Formatted Python Code
+
+* Using `yapf` but also discovered `black`.
+* `black` is new, gaining traction quickly (month or two, 1k+ Github Stars)
+* `black` is simple, no configuration, always produces the same result regardless of input (compare to `yapf` which depending on the given format may produce different results. For example no empty new line after heredoc is honoured but multiple new lines after heredoc reformat into a single empty new line; said again, no newline is not reformatted to a single new line but multiple new lines are reformatted to a single new line)
+* `black` is appealing to me on many levels but it doesn't make possible to aggressively pursue argument-per-line like `yapf` does with trailing comma. This is important to me. `black` also states it is far from production ready right now (aka. bugs)
+* I put together a pull-request using `isort` and `yapf`. `yapf` team has said they will not deal with import formatting because it is too complicated.
+* These two tools are listed as project deps.
+* When using `pyls` I will just need to install it into the environment of the project (assuming virtualenv is being used). Atom will pick this since afterall its the bin on PATH.
+* `pyls` is my editor-time integration. However not everyone on the team is or will necessarially use `pyls`. To streamline the workflow between team members a git hook is used to autoformat before committing.
+* To streamline the hook across the team I used a tool called `pre-commit`. It acts like a package manager for git hooks. There happens to already be a `yapf` and `isort` `pre-commit` package. The manifest looks like:
+
+```yaml
+# The bash-based entry points work around the fact that pre-commit framework
+# does not support inline/automatic modification of files on hook. Refer to
+# https://github.com/pre-commit/pre-commit/issues/747
+repos:
+  - repo: https://github.com/pre-commit/mirrors-yapf
+    rev: v0.21.0
+    hooks:
+      - id: yapf
+        entry: bash -c 'yapf "$@"; git add -u' --
+  - repo: https://github.com/pre-commit/mirrors-isort
+    sha: 'v4.3.4'
+    hooks:
+      - id: isort
+        entry: bash -c 'isort "$@"; git add -u' --
+```
+
+* Note the comment. Normally specifying the `entry` is not needed however because its important to me that autoformat silently and magically do its job without bothering the engineer and because any modified files on a hook cause `pre-commit` to fail this workaround was needed.
+* In bash `$@` means all the arguments that were passed to the script.
+* In `git add` `-u` stands for `--update` and it means and files that are in the stage that have changes in the working dir, stage again (this definition is not quite what I read online but its the only one that makes sense to me upon seeing its behaviour).
+
+##### Python Videos
+
+* Watched two python presentations
+* http://pyvideo.org/pycon-ca-2012/a-python-sthetic-beauty-and-why-i-python.html
+  * notes that code is improved if methods can be turned into functions that is logic that can model something other than a behaviour (uh, fp)
+  * notes that math is the guide to Python compared to a few other languages (uh, fp)
+  * notes that python has an internal consistent that will make sensitive people happy (so Haskell would make these people weep tears of joy?)
+  * notes that pipelines suffer from the problem that ``
+  * notes that good python should let the caller decide to qualify or not. This is what Go enforces at the language level. I like this. A lot. Haskell hasn't quite caught up in general to it, it seems.
+  * complains that one cannot symmetrically express binary operations (`a.foo(b) vs b.foo(a)`). But it seems to me Haskell works just fine here. It can express pipelines (meaning composed functions) that use currying to achieve either side `(+ a) b vs (+ b) a`.
+  * seems to love Donald Knuth.
+  * a lot of talk about code formatting, deviating from PEP8, etc. Seems like a big waste of time. Invest into an autoformatter and stop the bikeshedding.
+* http://pyvideo.org/pycon-us-2015/beyond-pep-8-best-practices-for-beautiful-inte.html
+  * seems like a seasoned engineer
+  * a lot of talk about PEP8 and formatting again just invest into an auto formatter
+  * really interesting point about weaker engineers gravitating to lesser problems like style improvement PRs.
+  * really great point that one will bias to the problems they feel comfortable solving; when in an environment they aren't comfortable in, will start solving meta/chore issues
+  * one big idea briefly mentioned is wrap non-pythonic APIs into Pythonic ones
+  * he uses classes that implement interfaces by simply having the `__foo__` functions defined for it
+  * An iterable just needs `__len__` and `__getitem__`
+
 ## 2018 Tue May 1
 
 Continued learnings into Python, AWS, Serverless.
@@ -173,13 +231,13 @@ foo a =
 Refactoring some util functions in `forto`. Realized I could be getting functions like `mapObject` from a library like `ramda` without bloating `forto` with their deps. Question was, how to make the libarary calls be inlined?
 
 ```ts
-import rollupTypesript from "rollup-plugin-typescript";
-import typescript from "typescript";
-import resolve from "rollup-plugin-node-resolve";
-import * as F from "ramda";
+import rollupTypesript from "rollup-plugin-typescript"
+import typescript from "typescript"
+import resolve from "rollup-plugin-node-resolve"
+import * as F from "ramda"
 
-const pkg = require("./package.json"); // [1]
-const external = F.keys(F.omit(["ramda"], pkg.dependencies)); // [2]
+const pkg = require("./package.json") // [1]
+const external = F.keys(F.omit(["ramda"], pkg.dependencies)) // [2]
 
 export default {
   input: "source/Main.ts",
@@ -203,7 +261,7 @@ export default {
       sourcemap: true,
     },
   ],
-};
+}
 ```
 
 1.  Read in `package.json` to get access to all the dependency names
