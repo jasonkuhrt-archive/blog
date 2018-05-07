@@ -20,7 +20,7 @@ Pull-Request to apply some new personal knowledge about Python tooling. Exposed 
 * These two tools are listed as project deps.
 * When using `pyls` I will just need to install it into the environment of the project (assuming virtualenv is being used). Atom will pick this since afterall its the bin on PATH.
 * `pyls` is my editor-time integration. However not everyone on the team is or will necessarially use `pyls`. To streamline the workflow between team members a git hook is used to autoformat before committing.
-* To streamline the hook across the team I used a tool called `pre-commit`. It acts like a package manager for git hooks. There happens to already be a `yapf` and `isort` `pre-commit` package. The manifest looks like:
+* To streamline the hook across the team I used a tool called [`pre-commit`](https://pre-commit.com/). It acts like a package manager for git hooks. There happens to already be a `yapf` and `isort` `pre-commit` package. The manifest looks like:
 
 ```yaml
 # The bash-based entry points work around the fact that pre-commit framework
@@ -49,7 +49,8 @@ repos:
 * http://pyvideo.org/pycon-ca-2012/a-python-sthetic-beauty-and-why-i-python.html
   * notes that code is improved if methods can be turned into functions that is logic that can model something other than a behaviour (uh, fp)
   * notes that math is the guide to Python compared to a few other languages (uh, fp)
-  * notes that python has an internal consistent that will make sensitive people happy (so Haskell would make these people weep tears of joy?)
+  * notes that python has an internal consistent that will make sensitive people happy (so Haskell would make these people weep tears of joy?); exact quote:
+    > my point is that Python has a logical inner consistency. And if you happen to be math-ish and sensitive, the consistency will make you happy.
   * notes that pipelines suffer from the problem that ``
   * notes that good python should let the caller decide to qualify or not. This is what Go enforces at the language level. I like this. A lot. Haskell hasn't quite caught up in general to it, it seems.
   * complains that one cannot symmetrically express binary operations (`a.foo(b) vs b.foo(a)`). But it seems to me Haskell works just fine here. It can express pipelines (meaning composed functions) that use currying to achieve either side `(+ a) b vs (+ b) a`.
