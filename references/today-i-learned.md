@@ -6,9 +6,39 @@ Also known as TIL, this stream records some of my personal learnings at a granul
 
 At the risk of stating the obvious this format is nothing new. Surely most thinkers (great or otherwise) from ancient to modern times have maintained some sort of log, journal, notebook, or whatever. In my contemporary setting I have had direct influence from others practicing this kind of TIL e.g. [jbranchaud](https://github.com/jbranchaud/til/commits/master), [thoughtbot](https://github.com/thoughtbot/til), [milooy](https://github.com/milooy/TIL).
 
+## 2018 Sun May 13
+
+* Another Python tool came to my attention: https://pyre-check.org. Released a few days ago [by Facebook](https://www.facebook.com/notes/protect-the-graph/pyre-fast-type-checking-for-python/2048520695388071/).
+* [Its easy to test local functions out with serverless](https://serverless.com/framework/docs/providers/aws/cli-reference/invoke-local/), for example the following was simply run in the root of a lambda project:
+
+  ```bash
+  ❯ sls invoke local --function on_message_2 --stage dev --data '{"a": 1}'
+  {"timestamp": "2018-05-13 23:44:42,744", "level": "DEBUG", "location": "countdown.on_message.on_message:14", "message": {"event": {"a": 1}}, "request_id": "1234567890"}
+
+  {
+      "statusCode": 200,
+      "body": "{}"
+  }
+  ```
+
+* To log JSON out of a lambda just make sure that whatever you output to `stdout` is compliant JSON. Example in Python (note the values must of course be JSON serializable):
+
+  ```py
+  log.debug(json.dumps({'event': event}))
+  ```
+
+* AWS Lambda HTTP handler simply returns JSON like the following to respond:
+
+```py
+return {
+  'statusCode': 200,
+  'body': '{}'
+}
+```
+
 ## 2018 Tue May 6
 
-Pull-Request to apply some new personal knowledge about Python tooling. Exposed to some Python videos.
+I made a pull-Request applying some new personal knowledge about Python tooling. I exposed myself to some Python videos reccommended to me by a coleague.
 
 ##### Automatically Formatted Python Code
 
@@ -232,21 +262,21 @@ foo a =
 Refactoring some util functions in `forto`. Realized I could be getting functions like `mapObject` from a library like `ramda` without bloating `forto` with their deps. Question was, how to make the libarary calls be inlined?
 
 ```ts
-import rollupTypesript from "rollup-plugin-typescript"
-import typescript from "typescript"
-import resolve from "rollup-plugin-node-resolve"
-import * as F from "ramda"
+import rollupTypesript from "rollup-plugin-typescript";
+import typescript from "typescript";
+import resolve from "rollup-plugin-node-resolve";
+import * as F from "ramda";
 
-const pkg = require("./package.json") // [1]
-const external = F.keys(F.omit(["ramda"], pkg.dependencies)) // [2]
+const pkg = require("./package.json"); // [1]
+const external = F.keys(F.omit(["ramda"], pkg.dependencies)); // [2]
 
 export default {
   input: "source/Main.ts",
   plugins: [
     rollupTypesript({
-      typescript,
+      typescript
     }),
-    resolve(),
+    resolve()
   ],
   external, // [3]
   output: [
@@ -254,15 +284,15 @@ export default {
       file: pkg.main,
       format: "umd",
       name: pkg.name,
-      sourcemap: true,
+      sourcemap: true
     },
     {
       file: pkg.module,
       format: "es",
-      sourcemap: true,
-    },
-  ],
-}
+      sourcemap: true
+    }
+  ]
+};
 ```
 
 1.  Read in `package.json` to get access to all the dependency names
