@@ -6,6 +6,29 @@ Also known as TIL, this stream records some of my personal learnings at a granul
 
 At the risk of stating the obvious this format is nothing new. Surely most thinkers (great or otherwise) from ancient to modern times have maintained some sort of log, journal, notebook, or whatever. In my contemporary setting I have had direct influence from others practicing this kind of TIL e.g. [jbranchaud](https://github.com/jbranchaud/til/commits/master), [thoughtbot](https://github.com/thoughtbot/til), [milooy](https://github.com/milooy/TIL).
 
+##
+
+## 2018 Sun May 20
+
+##### AWS Step Functions
+
+* AWS step functions can be implemented with an aws lambda
+* The terminology is state machines with states and each state can be an AWS Lambda
+* State names are scoped to region, not to the state machine they show up in... wtf ([ref](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-states.html))
+  > State machine names must be 1–80 characters in length, must be unique for your account and region, and must not contain any of the following: [...]
+* There are several types of states: `Task` (bread and butter, run some logic), `Pass` (for noops), `Choice` (for branching based on task result), `Parallel` (for running multiple whole state machines at the same time, blocking for completion of all, aggregating results), `Failure` which simply ends the state machine with a bit of optional extra error metadata, `Success` which simply ends the state machine happily. ([ref](httphttps://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-states.html))
+* There is the concept of paths. The purpose of paths is to control the data flowing through the state machine and navigating how to react to its structure. There are three types of paths: `InputPath`, `OutputPath`,`ResultPath`. IP is concerned with a selector that filters the data sent to the state task, output path is concerned with filtering what the state passes to the next state, result path is concerned with where the task result will fit into the given input. ([ref](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-input-output-processing.html)) The flow of path filtering is:
+  ```
+  state previous -> input -> state now -> IP -> task -> RP -> OP -> output -> state next
+  ```
+* paths are expressed as JSON Path
+* IP can use `$` to pass all input, `null` to pass none (`Task` will get `{}` as input)
+* RP can use `$` to pass just it to output (discard input), `null` to discard `Task` result, only support a subset of JSON Path b/c they are so-called `reference paths` which must identify a single node in a json structure.
+* OP must match something in IP/RP or else an exception is raised
+* OP can use `null` to pass `{}` as input to next state
+* If a state does not execute a task its input is its output
+* Still need to read about errors ([ref](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-errors.html))
+
 ## 2018 Sun May 13
 
 * Another Python tool came to my attention: https://pyre-check.org. Released a few days ago [by Facebook](https://www.facebook.com/notes/protect-the-graph/pyre-fast-type-checking-for-python/2048520695388071/).
