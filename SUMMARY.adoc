@@ -13,6 +13,7 @@
 
 
 
+* link:logs/14-journaling-the-foobar-platform/README.md[Journaling the Foobar Platform]
 * link:logs/13-npm-package-and-lock-file-basics/README.md[NPM Package & Lock File Basics]
 * link:logs/12-multi-stage-docker-builds/README.md[Multi-Stage Docker Builds]
 * link:logs/11-my-preferred-git-workflow/README.md[My preferred Git workflow]
