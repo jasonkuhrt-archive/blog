@@ -4,7 +4,11 @@ I am interested in exploring an architecture based on GraphQL. I will record my 
 
 - [Journaling The building of the Foobar Platform](#journaling-the-building-of-the-foobar-platform)
   - [Lay of the Land – June 7](#lay-of-the-land--june-7)
-  - [Breaking Ground – June 11](#breaking-ground--june-8)
+  - [Breaking Ground – June 11](#breaking-ground--june-11)
+      - [Prisma Server Locally](#prisma-server-locally)
+      - [Securing Prisma Server](#securing-prisma-server)
+      - [Onward](#onward)
+      - [Starting the Dialogue Schema](#starting-the-dialogue-schema)
 
 ## Lay of the Land – June 7
 
@@ -745,4 +749,174 @@ Wow! We get pagination for free. We can all sorts of conditional selects and bat
 
 #### Starting the Dialogue Schema
 
-Now that we've gotten some introductions out of the way lets begin building out our actual schema.
+Now that we've gotten some introductions out of the way lets begin building out our Foobar schema. Remember Foobar is a virtual clinic where patients can chat with practitioners.
+
+```graphql
+# General
+
+type User {
+  id: ID! @unique
+  email: string!
+  medical_episodes: [MedicalEpisode!]!
+  chat_messages: [ChatMessage!]!
+}
+
+type MedicalEpisode {
+  id: ID! @unique
+  resolved: Bool!
+  patient: User!
+  # If null it means the patient is waiting to be seen
+  practitioner: User
+  created_at: Date!
+  chat_messages: [ChatMessage!]!
+}
+
+# Messaging
+
+union ChatMessage = TextMessage
+
+interface ChatMessageBase {
+  id: ID! @unique
+  sent_at: Date!
+  # If null it means the message has not been delivered to peers yet
+  delivered_at: Date
+  medical_episode: MedicalEpisode!
+}
+
+type TextMessage implements ChatMessageBase {
+  content: string!
+  author: User!
+}
+```
+
+Now we have Users, chat messages that users can create, and chats that can contain both of those. The kind of chat we support is not general. Our concept of a chat is a medical episode that is initiated by a patient and responded to by a practitioner.
+
+This schema truly is a minimal first draft. I am doubtful that our epiosde modelling will capture the full chat model we need ultimately; Chat messages are going to need to have a multi-media concept; Bots and system messages will need to be supported.
+
+Before moving on lets deploy our updated Prisma service.
+
+```
+$ prisma deploy
+```
+
+```
+Deploying service `default` to stage `default` to server `local` 134ms
+
+Errors:
+
+  User
+    ✖ The field `email` has the type `string!` but there's no type or enum declaration with that name.
+    ✖ The field `chat_messages` has the type `[ChatMessage!]!` but there's no type or enum declaration with that name.
+
+  MedicalEpisode
+    ✖ The field `resolved` has the type `Bool!` but there's no type or enum declaration with that name.
+    ✖ The field `created_at` has the type `Date!` but there's no type or enum declaration with that name.
+    ✖ The field `chat_messages` has the type `[ChatMessage!]!` but there's no type or enum declaration with that name.
+    ✖ The relation field `patient` must specify a `@relation` directive: `@relation(name: "MyRelation")`
+    ✖ The relation field `practitioner` must specify a `@relation` directive: `@relation(name: "MyRelation")`
+
+  TextMessage
+    ✖ The field `content` has the type `string!` but there's no type or enum declaration with that name.
+
+Deployment canceled. Please fix the above errors to continue deploying.
+Read more about deployment errors here: https://bit.ly/prisma-force-flag
+```
+
+Nice feedback, we made a bunch of mistakes. Some of these errors I'm not sure how to fix, like `Date` not being a known type. This is a good time to refer to the [Prisma data modelling docs](https://www.prisma.io/docs/reference/service-configuration/data-modelling-(sdl)-eiroozae8u).
+
+* [I discovered that GQL interfaces are not currently supported](https://github.com/prismagraphql/prisma/issues/83). :(
+* [I discovered that GQL unions are not currently supported](https://github.com/prismagraphql/prisma/issues/165)
+* [I discovered that there is a an issue suggesting many more data model constraints](https://github.com/prismagraphql/prisma/issues/728)
+
+Our revised schema looks like:
+
+```graphql
+type User {
+  id: ID! @unique
+  email: String! @unique
+  medical_episodes: [MedicalEpisode!]! @relation(name: "MedicalEpisodes")
+  chat_messages: [ChatMessage!]!
+}
+
+type MedicalEpisode {
+  id: ID! @unique
+  resolved: Boolean @default(value: "false")
+  patient: User! @relation(name: "Patient")
+  # If null it means the patient is waiting to be seen
+  practitioner: User @relation(name: "Practitioner")
+  created_at: DateTime!
+  chat_messages: [ChatMessage!]!
+}
+
+type ChatMessage {
+  # interface
+  id: ID! @unique
+  sent_at: DateTime!
+  # If null it means the message has not been delivered to peers yet
+  delivered_at: DateTime
+  medical_episode: MedicalEpisode!
+  # TextMessage
+  content: String!
+  owner: User!
+}
+```
+
+And now the deploy works:
+
+```
+Deploying service `default` to stage `default` to server `local` 411ms
+
+Changes:
+
+  User (Type)
+  - Deleted field `name`
+  + Created field `email` of type `String!`
+  + Created field `medical_episodes` of type `[Relation!]!`
+  + Created field `chat_messages` of type `[Relation!]!`
+
+  MedicalEpisode (Type)
+  + Created type `MedicalEpisode`
+  + Created field `id` of type `GraphQLID!`
+  + Created field `resolved` of type `Boolean`
+  + Created field `patient` of type `Relation!`
+  + Created field `practitioner` of type `Relation`
+  + Created field `created_at` of type `DateTime!`
+  + Created field `chat_messages` of type `[Relation!]!`
+  + Created field `updatedAt` of type `DateTime!`
+  + Created field `createdAt` of type `DateTime!`
+
+  ChatMessage (Type)
+  + Created type `ChatMessage`
+  + Created field `id` of type `GraphQLID!`
+  + Created field `sent_at` of type `DateTime!`
+  + Created field `delivered_at` of type `DateTime`
+  + Created field `medical_episode` of type `Relation!`
+  + Created field `content` of type `String!`
+  + Created field `owner` of type `Relation!`
+  + Created field `updatedAt` of type `DateTime!`
+  + Created field `createdAt` of type `DateTime!`
+
+  ChatMessageToUser (Relation)
+  + Created relation between ChatMessage and User
+
+  Practitioner (Relation)
+  + Created relation between MedicalEpisode and User
+
+  ChatMessageToMedicalEpisode (Relation)
+  + Created relation between ChatMessage and MedicalEpisode
+
+  Patient (Relation)
+  + Created relation between MedicalEpisode and User
+
+  MedicalEpisodes (Relation)
+  + Created relation between MedicalEpisode and User
+
+Applying changes 1.1s
+
+Your Prisma GraphQL database endpoint is live:
+
+  HTTP:  http://localhost:4466
+  WS:    ws://localhost:4466
+```
+
+Lets see how far we can get before this schema starts to feel uncomfortable. Next up we will create a Gateway that our subsequent apps can use.
