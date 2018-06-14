@@ -9,6 +9,7 @@ I am interested in exploring an architecture based on GraphQL. I will record my 
       - [Securing Prisma Server](#securing-prisma-server)
       - [Onward](#onward)
       - [Starting the Dialogue Schema](#starting-the-dialogue-schema)
+  - [The Gateway – June 13](#the-gateway--june-13)
 
 ## Lay of the Land – June 7
 
@@ -332,6 +333,8 @@ With our first Prisma Service deployed we can start to play with it:
 ```
 $ prisma playground
 ```
+
+![graphql playgronud](./assets/graphql-playground.png)
 
 Interruption: Just discovered a [new GraphQL book beta was released today](https://graphql.guide/). Neat. Also found out that a new version (polish) of the [GraphQL spec was published 23 hours ago](https://github.com/facebook/graphql/releases/tag/June2018).
 
@@ -919,4 +922,264 @@ Your Prisma GraphQL database endpoint is live:
   WS:    ws://localhost:4466
 ```
 
+A quick test drive:
+
+Create a subscription for any new users created:
+
+```graphql
+subscription users {
+  user(where: { mutation_in: [CREATED] }) {
+    node {
+      id
+      email
+    }
+  }
+}
+```
+
+In a new tab, create some new users. Here's a mutation I used (supply the email variable in the variables tab at the bottom):
+
+```graphql
+mutation create_user ($email: String!) {
+  createUser(data: { email: $email}) {
+    id
+  }
+}
+```
+
+You should see data coming through on your subscription: 
+
+```json
+
+{
+  "data": {
+    "user": {
+      "node": {
+        "id": "cjiceqbhl000a0739178vwy8n",
+        "email": "foo@bar.qux"
+      }
+    }
+  }
+}
+
+{
+  "data": {
+    "user": {
+      "node": {
+        "id": "cjiceqq2r000d073977y10odp",
+        "email": "bar@qux.foo"
+      }
+    }
+  }
+}
+```
+
+Lets try pagination:
+
+```graphql
+query users {
+  usersConnection {
+    pageInfo {
+      hasPreviousPage
+      hasNextPage
+      endCursor
+      startCursor
+    }
+    edges {
+      node {
+        id
+        email
+      }
+    }
+    aggregate {
+      count
+    }
+  }
+}
+```
+```json
+{
+  "data": {
+    "usersConnection": {
+      "pageInfo": {
+        "hasPreviousPage": false,
+        "hasNextPage": false,
+        "endCursor": "cjiceqq2r000d073977y10odp",
+        "startCursor": "cjice6h3300040739eeqq971m"
+      },
+      "edges": [
+        {
+          "node": {
+            "id": "cjice6h3300040739eeqq971m",
+            "email": "jasonkuhrt@me.com"
+          }
+        },
+        {
+          "node": {
+            "id": "cjiceqbhl000a0739178vwy8n",
+            "email": "foo@bar.qux"
+          }
+        },
+        {
+          "node": {
+            "id": "cjiceqq2r000d073977y10odp",
+            "email": "bar@qux.foo"
+          }
+        }
+      ],
+      "aggregate": {
+        "count": 3
+      }
+    }
+  }
+}
+```
+
 Lets see how far we can get before this schema starts to feel uncomfortable. Next up we will create a Gateway that our subsequent apps can use.
+
+## The Gateway – June 13 
+
+Lets create a GraphQL gateway that will be consumed by client apps. 
+
+We can remain in the `foobar` project folder and just tuck away the files we've accumulated so far into a folder called `/prisma`. 
+
+```
+$ mkdir prisma
+$ mv {datamodel.graphql,docker-compose.yml,prisma.yml} prisma
+```
+We will create a new node server using `graphql-yoga`.
+
+```
+$ yarn init -y
+$ yarn add graphql-yoga
+```
+
+
+> .  
+> **Aside**  
+> Just discovered a [nice aggregation of GraphQL tech](https://www.graphqlstack.com/) which therein included led me to discover [FastQL](https://fastql.io/). Nice.  
+> .
+
+Lets start off with a server that is more or less taken right out of the docs:
+
+```
+$ cat source/Main.ts
+```
+
+```
+import { GraphQLServer } from "graphql-yoga"
+
+const typeDefs = `
+  type Query {
+    hello(name:string): String!
+  }
+`
+
+const resolvers = {
+  Query: {
+    hello: () => {
+      return ""
+    },
+  },
+}
+
+const server = new GraphQLServer({ typeDefs, resolvers })
+
+server.start().then(server => {
+  console.log("started server at %s", server.address())
+})
+```
+
+One of the things I don't like right off the bat is that:
+
+* Our schema is a raw string in the codebase. At a minimum this prevents us from good syntax highlighting, but not just that...
+* We don't get prettier auto-formatting
+* Our resolver to `hello` is not typed. This is bad. Its type is a function of our schema. To type it we need to somehow convert our schema into TypeScript. It turns out that there is already a tool for that! [`graphql-code-generator`](https://github.com/dotansimha/graphql-code-generator#readme) (and [`graphql-codegen-typescript-template`](https://github.com/dotansimha/graphql-code-generator/tree/master/packages/templates/typescript) which plugs support for TypeScript). ~To leverage this tool it seems that we need to extract our schema into an external schema file.~ Turns out I was wrong, see below.
+
+So for these two reasons alone it seems to me that we want to create a `schema.graphql` file in our project. But then how will we pass it to the `GraphQLServer` function in our code? There's a tool for that too: [`graphql-import`](https://github.com/prismagraphql/graphql-import).
+
+Lets try all this.
+
+> .
+> **Aside**
+> Got interrupted by this [nonsense](https://github.com/prismagraphql/graphql-yoga/issues/368) 
+> Work around for now was to put `"skipLibCheck": true,` into my tsconfig.
+> .
+
+> .
+> **Aside**
+> Using [`ts-node-dev`](https://github.com/whitecolor/ts-node-dev) to re-start server on file change 
+> .
+
+We craete a script:
+
+```json
+"build:schema-ts": "gql-gen --schema http://localhost:4000 --template typescript --out ./source/SchemaTypes.ts"
+```
+
+What this does is:
+
+* Download our server schema from a GQL endpoint (`--schema ...`)
+* Create TypeScript types (`--template ...`)
+* Outputs the TypeScript file to our source dir using given name `--out ...`
+
+When we run it:
+
+```
+$ yarn -s build:schema-ts
+23:46:58.831 - info: Loading GraphQL Introspection from remote: http://localhost:4000...
+23:46:59.571 - info: Generated file written to /Users/jasonkuhrt/projects/personal/foobar/source/SchemaTypes.ts
+```
+
+And we get the following contents:
+
+```
+$ cat source/Schema.ts
+```
+```graphql
+/* tslint:disable */
+
+export interface Query {
+  hello: string
+}
+export interface HelloQueryArgs {
+  name?: string | null
+}
+```
+
+Now we can update our server like so:
+
+```graphql
+import * as GQLImport from "graphql-import"
+import * as Yoga from "graphql-yoga"
+import * as S from "./SchemaTypes"
+
+const typeDefs = GQLImport.importSchema(__dirname + "/schema.graphql")
+
+const resolvers = {
+  Query: {
+    hello: (_: any, args: S.HelloQueryArgs) => {
+      if (args.name) {
+        return args.name.length
+      } else {
+        return "someone..."
+      }
+    },
+  },
+}
+
+const server = new Yoga.GraphQLServer({ typeDefs, resolvers })
+
+server.start().then(server => {
+  console.log("started server at %s", JSON.stringify(server.address()))
+})
+```
+
+Yay! I still don't know enough about the first `obj` argument to resolvers to tackle them. [They are briefly mentioned in the Apollo Server docs](https://www.apollographql.com/docs/graphql-tools/resolvers#Resolver-function-signature) but I need to actually play with them to fully understand. There is an [issue on GraphQL Tools repo about statically typing resolvers](https://github.com/apollographql/graphql-tools/issues/404).
+
+So it turns out the only reasons for extracting the schema to its own `.graphql` file is for syntax highlighting and prettier autoformatting, so far...I thnink the endgame for external files anyways is to have modular schema/resolver groupings [like this example](https://github.com/prismagraphql/graphql-yoga/tree/master/examples/modular-resolvers#implementation). This point also brings up another reason why it makes sense that `gql-gen` does not rely on a file being passed but rather the server introspection: It doesn't matter how one structures their server, introspection will always yield a perfect resolved schema without any configuration fuss on how to do that. 👍
+
+> .
+> **Aside**
+> I should probably create a minimal blog post about typing graphql server resolvers as there is no dead-simpel 1-2-3 on this published that I know of yet.
+> .
