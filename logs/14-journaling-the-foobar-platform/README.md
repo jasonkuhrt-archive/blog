@@ -10,6 +10,9 @@ I am interested in exploring an architecture based on GraphQL. I will record my 
       - [Onward](#onward)
       - [Starting the Dialogue Schema](#starting-the-dialogue-schema)
   - [The Gateway – June 13](#the-gateway--june-13)
+      - [GQL Playground With Multiple Apps](#gql-playground-with-multiple-apps)
+      - [Building the Scheama](#building-the-scheama)
+        - [User Sign Up](#user-sign-up)
 
 ## Lay of the Land – June 7
 
@@ -48,6 +51,8 @@ Some of the tools I have earmarked for my journey:
 
 - ~~AWS App Sync~~
   [Here is a nice technical demo/intro video for AppSync](https://www.youtube.com/watch?v=jZ2yd9xd-fI). This is a hosted-graphql option from AWS. I have played a big with it and concluded that for integration into a larger platform and leveraging the community tools it is not the ideal option. It seems great if I were built a green field project. But at Dialogue where the use-case I have in mind is, we have many databases, APIs etc. already. I could wire up lambda functions to AppSync resolvers to implement all the custom logic I want but it still doesn't equal what is possible with custom schema directives, schema stitching, and introspective the selection set for easy forwarding to second-layer graphql services. I may revisit AppSync later but presently I want to start with the flexibility and see later if I can achieve it with AppSync.
+
+  -- edit: Note I learned about [serverless-appsync-plugin](https://github.com/sid88in/serverless-appsync-plugin) which would appear to make appsync a _lot_ more usable.
 
 - Learning material
 
@@ -1183,3 +1188,45 @@ So it turns out the only reasons for extracting the schema to its own `.graphql`
 > **Aside**
 > I should probably create a minimal blog post about typing graphql server resolvers as there is no dead-simpel 1-2-3 on this published that I know of yet.
 > .
+
+I pushed the code so far to https://github.com/jasonkuhrt/fooql.
+
+#### GQL Playground With Multiple Apps
+
+I just fixed my `.graphqlconfig.yaml` so that when I boot up `graphql playground` it has both the prisma service and the gateway available to play with. This is great because I can have a great feedback loop when I have qustions of my services/data to ask. I'm also able to target a stage of those services. So while right now its just dev I could conceivably have production or some other staging there as well. So basically given a graphqlconfig file graphql cli knows how to serve up a client-side app (the playground) and have it connected to the given apps defined in said graphqlconfig. And of course this playground could be something deployed in the cloud for use by the team and what not.
+
+![gql playground multiple apps](./assets/graphql-playground-multiple-apps.png)
+
+> Minor detail, I'm hitting [this issue](https://github.com/graphql-cli/graphql-cli/issues/302) where a warning pops up when I start a playground.
+
+#### Building the Scheama
+
+Looking back at the databse schema I see that there are a few things we want to expose in the gateway. Lets design the schema now. One thing that will become apparent is how the gateway allows us to speak in terms of our domain while prisma services are low-level CRUD oriented. 
+
+##### User Sign Up
+
+First up lets make it possible for users to sign up.
+
+> Noticed that we did not restart the server as we worked on the graphql file. Not acceptable. Solution was `nodemon --exec ts-node source/Main.ts --ext graphql,ts`
+
+One thing we'll notice right away is the duplication of types:
+
+```graphql
+type Query {
+  hello(name: String): String
+}
+
+input SignupInput {
+  email: String!
+}
+
+type Mutation {
+  signup(input: SignupInput!): User!
+```
+
+We have redefined `email` and would have to redefine `User`. But we already have this schema data at our db level! Lets find out how to leverage it. Reading:
+
+* https://www.prisma.io/blog/graphql-schema-stitching-explained-schema-delegation-4c6caf468405/
+* https://blog.graph.cool/how-do-graphql-remote-schemas-work-7118237c89d7
+* https://www.apollographql.com/docs/graphql-tools/schema-stitching.html
+* https://medium.com/open-graphql/graphql-schema-stitching-in-action-with-apollo-eba04f250588
