@@ -13,6 +13,8 @@ I am interested in exploring an architecture based on GraphQL. I will record my 
       - [GQL Playground With Multiple Apps](#gql-playground-with-multiple-apps)
       - [Building the Scheama](#building-the-scheama)
         - [User Sign Up](#user-sign-up)
+  - [Entry](#entry)
+      - [Basic Data Migration Scenario](#basic-data-migration-scenario)
 
 ## Lay of the Land – June 7
 
@@ -1116,7 +1118,7 @@ Lets try all this.
 > Using [`ts-node-dev`](https://github.com/whitecolor/ts-node-dev) to re-start server on file change 
 > .
 
-We craete a script:
+We create a script:
 
 ```json
 "build:schema-ts": "gql-gen --schema http://localhost:4000 --template typescript --out ./source/SchemaTypes.ts"
@@ -1226,7 +1228,127 @@ type Mutation {
 
 We have redefined `email` and would have to redefine `User`. But we already have this schema data at our db level! Lets find out how to leverage it. Reading:
 
-* https://www.prisma.io/blog/graphql-schema-stitching-explained-schema-delegation-4c6caf468405/
-* https://blog.graph.cool/how-do-graphql-remote-schemas-work-7118237c89d7
+* [Part 1: How do GraphQL remote schemas work](https://blog.graph.cool/how-do-graphql-remote-schemas-work-7118237c89d7) 
+  * [Nice succinct summary of how one might approach resolvers](https://blog.graph.cool/how-do-graphql-remote-schemas-work-7118237c89d7#8fb5) 
+  * [Another good, prior article, on writing resolvers](https://blog.graph.cool/graphql-server-basics-the-schema-ac5e2950214e)
+  * This article makes plain how to get started runnnig local GQL servers based on remote schemas
+* [Part 2: GraphQL schema stitching explained: Schema Delegation](https://www.prisma.io/blog/graphql-schema-stitching-explained-schema-delegation-4c6caf468405/) 
+  * [Github GraphQL API Schema Delegation example (repo)](https://github.com/nikolasburk/github-schema-delegation)
+* https://www.prisma.io/blog/reusing-and-composing-graphql-apis-with-graphql-bindings-80a4aa37cff5/
+* https://dev-blog.apollodata.com/the-next-generation-of-schema-stitching-2716b3b259c0
 * https://www.apollographql.com/docs/graphql-tools/schema-stitching.html
+  * The Apollo GraphQL Guide looks generally good https://www.apollographql.com/docs/guides/schema-design.html
 * https://medium.com/open-graphql/graphql-schema-stitching-in-action-with-apollo-eba04f250588
+
+
+> [Just discovered the new VSCode GraphQL Plugin](https://www.prisma.io/blog/vscode-thieghu7shoo/)!
+
+Notings from readings:
+
+- there are type definitions which in aggregate make up a gql schema
+- there is a schema and executable schema, the latter being schema with resolvers attached
+- a workflow for working with remote schema:
+  - download the remote schema by using the gql spec introspect query on the remote gql service; this returns an introspection result, JSON, like any other query response 
+  - more specifically there is an `intropectSchema` function that accepts an Apollo link instantiated to point to the remote gql service
+  - Apollo graphql-tools also has `makeRemoteExecutableSchema` function which accepts an introspection schema, converts it into a gql schema
+  - this gql schema is then fed to `GraphQLServer` like any other
+  - NOTE I do not deeply understand Apollo Link  
+  - the resolvers are a highly dynamic function produced by `makeRemoteExecutableSchema`; they pull the selection set from the gql document and forward them to the remote gql service; in this way they can make the whole query in one resolver and then the child resolvers just pull data out of said response
+  - things get more complicated but more useful with schema stitching which is the idea of unifying multiple schemas
+  - there can be schema merging or schema delegation
+  - schema delegation is when the resolution of a query is not handled by the local gql service but the remote gql service
+  - NOTE schema merging is ??? Still need to learn
+
+
+  As a consequence of these learnings before trying to create a schema that is unified with a prisma service I will try to simply make a local gql service that whose schema is based on remote in a fully passthrough manner. 
+
+  > Just hit this blocker: https://github.com/apollographql/graphql-tools/issues/748
+  > It is surprising to find out that Apollo GraphQL Tools does not seemingly support TS without issue given its built in TS
+  > * https://github.com/apollographql/graphql-tools/search?q=typescript&type=Issues
+  > * https://github.com/apollographql/graphql-tools/issues/704
+  > * https://github.com/apollographql/graphql-tools/issues/748
+  > * https://github.com/apollographql/graphql-tools/issues/726
+
+  > Done: https://github.com/jasonkuhrt/gql-experiments/tree/master/prisma-passthrough
+
+
+
+## Entry
+
+
+#### Basic Data Migration Scenario
+
+I hit a data migration scenario in Prisma.
+
+I'm adding a field to user type called `deactivated` to model soft deletes of users. But there are some users in the db already that do not have this field, and I want the field to be not-nullable. I got this error:
+
+```
+Deploying service `core` to stage `dev` to server `local` 436ms
+
+Errors:
+
+  User
+    ✖ You are creating a required field but there are already nodes present that would violate that constraint.
+
+Deployment canceled. Please fix the above errors to continue deploying.
+Read more about deployment errors here: https://bit.ly/prisma-force-flag
+```
+
+Read:
+* https://www.prisma.io/docs/reference/service-configuration/data-model/migrations-ao8viesh2r
+* https://www.prisma.io/docs/reference/service-configuration/data-model/data-modelling-(sdl)-eiroozae8u/#default-value
+  * I thought `@default` would help but having it did not alter the above error
+  * My assumption was that Prisma would migrate the db using the default for current records ([like his](https://github.com/prismagraphql/prisma/issues/2323#issuecomment-388392698))
+  * It is in fact only for new records
+* https://www.prisma.io/forum/t/how-to-deploy-new-required-boolean-field-to-prisma/3334/7
+  * has all the info I need; Basically you need to follow the following workflow
+  * do not make field nullable (`!`)
+  * deploy, existing records will have have null for the new field
+  * mutate all the records to have the desired value for the new field. This might be multiple mutations if the field sematnic is non-trivial and/or ther are many records pre-existing. [`updateManyX`](https://www.prisma.io/docs/reference/service-configuration/data-modelling-(sdl)-eiroozae8u#migrating-the-value-of-a-scalar-field) is a nice mutation for this purpose.
+  * with each record now populated with some value, update the schema with `!`!
+  * assumption: new records entering the db literally as this process is being done should/must not allow further `null`s otherwise it will be a constant race condition to run the above step
+* [open issue about how to automate data migrations](https://github.com/prismagraphql/prisma/issues/2323)
+
+It now worked, my exact workflow:
+
+```
+❯ prisma deploy
+Deploying service `core` to stage `dev` to server `local` 389ms
+
+Changes:
+
+  User (Type)
+  + Created field `deactivated` of type `Boolean`
+
+Applying changes 1.1s
+
+Your Prisma GraphQL database endpoint is live:
+
+  HTTP:  http://localhost:4466/core/dev
+  WS:    ws://localhost:4466/core/dev
+```
+
+```graphql
+mutation {
+  updateManyUsers(data:{deactivated:false}) {
+    count
+  }
+}
+```
+
+```
+❯ prisma deploy
+Deploying service `core` to stage `dev` to server `local` 129ms
+
+Changes:
+
+  User (Type)
+  ~ Updated field `deactivated`. It became required.
+
+Applying changes 1.1s
+
+Your Prisma GraphQL database endpoint is live:
+
+  HTTP:  http://localhost:4466/core/dev
+  WS:    ws://localhost:4466/core/dev
+```
