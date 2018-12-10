@@ -6,6 +6,12 @@ Also known as TIL, this stream records some of my personal learnings at a granul
 
 At the risk of stating the obvious this format is nothing new. Surely most thinkers (great or otherwise) from ancient to modern times have maintained some sort of log, journal, notebook, or whatever. In my contemporary setting I have had direct influence from others practicing this kind of TIL e.g. [jbranchaud](https://github.com/jbranchaud/til/commits/master), [thoughtbot](https://github.com/thoughtbot/til), [milooy](https://github.com/milooy/TIL).
 
+## 2018 Sun Dec 9
+
+* VSCode defaults to using its own built in TypeSript. Does not use the one a project has installed (aka. workspace). [Can be configured to](https://github.com/Microsoft/vscode/issues/42243).
+* `Omit` can be derived from `Exclude` but is not part of the TypeScript utility types stdlib. `Exclude` works on sets like `a | b | c` while `Omit` removes fields from an object. This and many other utility implementations can be found at https://github.com/piotrwitek/utility-type.
+
+
 ## 2018 Sat May 26
 
 * Python PEP in 2006 for defining the concept of function annotations, just syntax, no inherent semantics
